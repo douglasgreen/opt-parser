@@ -13,59 +13,22 @@
         }
     ],
     "keywords": [
-        "ast",
-        "automation",
-        "ci cd",
         "cli",
-        "cli library",
-        "cli tool",
-        "code quality",
-        "code standards",
-        "code validation",
-        "coding standards",
         "command",
         "command line",
         "command-line interface",
-        "command-line utility",
-        "composer",
         "console",
-        "directory",
-        "exceptions",
-        "file",
-        "fixing",
-        "linter",
-        "linting",
+        "option parser",
         "php",
-        "php automation",
         "php cli",
-        "php command line",
-        "php console application",
-        "phpcs",
-        "php cs fixer",
-        "php fig",
-        "php parser",
         "php scripting",
-        "phpunit",
-        "psr",
-        "regex",
-        "scripting",
-        "static analysis",
-        "syntax check",
-        "terminal",
-        "testing",
-        "utility",
-        "wrapper"
+        "utility"
     ],
     "autoload": {
         "psr-4": {
-            "DouglasGreen\\OptParser\\": "src/OptParser",
-            "DouglasGreen\\PhpLinter\\": "src/PhpLinter",
-            "DouglasGreen\\Utility\\": "src/Utility"
+            "DouglasGreen\\OptParser\\": "src/"
         }
     },
-    "bin": [
-        "bin/check-style"
-    ],
     "config": {
         "sort-packages": true
     },
@@ -78,12 +41,10 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
-        "nette/neon": "^3.4"
+        "php": ">=8.1"
     },
     "require-dev": {
         "douglasgreen/config-setup": "dev-main",
-        "php-mock/php-mock": "^2.5",
         "phpstan/phpstan": "^1.11",
         "phpunit/phpunit": "^10.5",
         "rector/rector": "^1.2",
