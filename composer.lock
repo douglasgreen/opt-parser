@@ -4,8 +4,72 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d4e3c29998b4ceca0475a03d05780f46",
-    "packages": [],
+    "content-hash": "5f0b214ed064631442b9cdb652793b33",
+    "packages": [
+        {
+            "name": "douglasgreen/utility",
+            "version": "v0.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/douglasgreen/utility.git",
+                "reference": "78a8a9872cfd50f18d2d09d2b4fb2e7c8b07ca28"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/douglasgreen/utility/zipball/78a8a9872cfd50f18d2d09d2b4fb2e7c8b07ca28",
+                "reference": "78a8a9872cfd50f18d2d09d2b4fb2e7c8b07ca28",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "douglasgreen/config-setup": "dev-main",
+                "php-mock/php-mock": "^2.5",
+                "phpstan/phpstan": "^1.11",
+                "phpunit/phpunit": "^10.5",
+                "rector/rector": "^1.2",
+                "symplify/easy-coding-standard": "^12.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DouglasGreen\\Utility\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Douglas Green",
+                    "email": "douglas@nurd.site",
+                    "homepage": "https://nurd.site/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "PHP utility project for exception classes and wrapper functions",
+            "homepage": "https://github.com/douglasgreen/utility",
+            "keywords": [
+                "code quality",
+                "coding standards",
+                "exceptions",
+                "function signatures",
+                "php",
+                "php automation",
+                "static analysis",
+                "type checking",
+                "utility",
+                "wrapper"
+            ],
+            "support": {
+                "issues": "https://github.com/douglasgreen/utility/issues",
+                "source": "https://github.com/douglasgreen/utility/tree/v0.5.0"
+            },
+            "time": "2024-07-15T23:46:33+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "douglasgreen/config-setup",
@@ -13,12 +77,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/douglasgreen/config-setup.git",
-                "reference": "bb1bc4294d1900a7c583480dca79217d4c9f1744"
+                "reference": "25de946ebf402548a4972d8aa28c15da81ca66f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/douglasgreen/config-setup/zipball/bb1bc4294d1900a7c583480dca79217d4c9f1744",
-                "reference": "bb1bc4294d1900a7c583480dca79217d4c9f1744",
+                "url": "https://api.github.com/repos/douglasgreen/config-setup/zipball/25de946ebf402548a4972d8aa28c15da81ca66f6",
+                "reference": "25de946ebf402548a4972d8aa28c15da81ca66f6",
                 "shasum": ""
             },
             "require": {
@@ -62,40 +126,25 @@
                     "role": "Developer"
                 }
             ],
-            "description": "Preconfigured setup files for linting, fixing, and testing PHP and JavaScript project",
+            "description": "Preconfigured setup files for linting, fixing, and testing PHP and JavaScript projects",
             "homepage": "https://github.com/douglasgreen/config-setup",
             "keywords": [
                 "automation",
-                "cli",
-                "cli library",
-                "cli tool",
                 "code quality",
                 "code standards",
                 "code validation",
-                "coding standards",
-                "command-line interface",
                 "config",
-                "console",
                 "fixing",
                 "linter",
                 "linting",
                 "php",
-                "php automation",
-                "php cli",
-                "php command line",
-                "php console application",
-                "php fig",
-                "php scripting",
-                "phpunit",
-                "psr",
-                "syntax check",
-                "terminal"
+                "phpunit"
             ],
             "support": {
                 "source": "https://github.com/douglasgreen/config-setup/tree/main",
                 "issues": "https://github.com/douglasgreen/config-setup/issues"
             },
-            "time": "2024-07-14T23:12:09+00:00"
+            "time": "2024-07-16T22:09:14+00:00"
         },
         {
             "name": "myclabs/deep-copy",
@@ -883,16 +932,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "1.2.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "2fa387553db22b6f9bcccf5ff16f2c2c18a52a65"
+                "reference": "b38a3eed3ce2046f40c001255e2fec9d2746bacf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/2fa387553db22b6f9bcccf5ff16f2c2c18a52a65",
-                "reference": "2fa387553db22b6f9bcccf5ff16f2c2c18a52a65",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/b38a3eed3ce2046f40c001255e2fec9d2746bacf",
+                "reference": "b38a3eed3ce2046f40c001255e2fec9d2746bacf",
                 "shasum": ""
             },
             "require": {
@@ -930,7 +979,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/1.2.0"
+                "source": "https://github.com/rectorphp/rector/tree/1.2.1"
             },
             "funding": [
                 {
@@ -938,7 +987,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-07-01T14:24:45+00:00"
+            "time": "2024-07-16T00:22:54+00:00"
         },
         {
             "name": "sebastian/cli-parser",

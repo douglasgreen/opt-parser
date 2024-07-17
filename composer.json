@@ -21,8 +21,7 @@
         "option parser",
         "php",
         "php cli",
-        "php scripting",
-        "utility"
+        "php scripting"
     ],
     "autoload": {
         "psr-4": {
@@ -41,7 +40,8 @@
         }
     ],
     "require": {
-        "php": ">=8.1"
+        "php": ">=8.1",
+        "douglasgreen/utility": "^0.5"
     },
     "require-dev": {
         "douglasgreen/config-setup": "dev-main",
