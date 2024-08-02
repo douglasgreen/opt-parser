@@ -43,8 +43,6 @@ class ArgParser
     protected string $programName;
 
     /**
-     * Constructor.
-     *
      * @param list<string> $args Command-line arguments
      *
      * @throws ValueException If no program name is provided

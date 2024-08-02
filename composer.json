@@ -1,17 +1,7 @@
 {
     "name": "douglasgreen/opt-parser",
     "description": "Command-line option parser for PHP",
-    "license": "MIT",
     "type": "library",
-    "homepage": "https://github.com/douglasgreen/opt-parser",
-    "authors": [
-        {
-            "name": "Douglas Green",
-            "email": "douglas@nurd.site",
-            "homepage": "https://nurd.site/",
-            "role": "Developer"
-        }
-    ],
     "keywords": [
         "cli",
         "command",
@@ -23,13 +13,31 @@
         "php cli",
         "php scripting"
     ],
+    "homepage": "https://github.com/douglasgreen/opt-parser",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Douglas Green",
+            "email": "douglas@nurd.site",
+            "homepage": "https://nurd.site/",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "douglasgreen/utility": "^0.5"
+    },
+    "require-dev": {
+        "douglasgreen/config-setup": "dev-main",
+        "phpstan/phpstan": "^1.11.9",
+        "phpunit/phpunit": "^10.5.29",
+        "rector/rector": "^1.2.2",
+        "symplify/easy-coding-standard": "^12.3.4"
+    },
     "autoload": {
         "psr-4": {
             "DouglasGreen\\OptParser\\": "src/"
         }
-    },
-    "config": {
-        "sort-packages": true
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -39,16 +47,8 @@
             "url": "https://github.com/douglasgreen/config-setup"
         }
     ],
-    "require": {
-        "php": ">=8.1",
-        "douglasgreen/utility": "^0.5"
-    },
-    "require-dev": {
-        "douglasgreen/config-setup": "dev-main",
-        "phpstan/phpstan": "^1.11",
-        "phpunit/phpunit": "^10.5",
-        "rector/rector": "^1.2",
-        "symplify/easy-coding-standard": "^12.3"
+    "config": {
+        "sort-packages": true
     },
     "scripts": {
         "lint": [
@@ -60,8 +60,8 @@
             "ecs --fix",
             "rector"
         ],
-        "post-install-cmd": "config-setup --pre-commit",
-        "post-update-cmd": "config-setup --pre-commit",
+        "post-install-cmd": "config-setup",
+        "post-update-cmd": "config-setup",
         "test": "phpunit"
     }
 }
