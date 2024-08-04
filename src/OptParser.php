@@ -201,6 +201,11 @@ class OptParser
             $args = $argv;
         }
 
+        // If no usages have been added, add all by default.
+        if ($this->usages === []) {
+            $this->addUsageAll();
+        }
+
         $this->argParser = new ArgParser($args);
         $unmarkedOptions = $this->argParser->getUnmarkedOptions();
         $markedOptions = $this->argParser->getMarkedOptions();
