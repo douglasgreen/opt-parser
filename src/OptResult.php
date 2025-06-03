@@ -40,7 +40,7 @@ class OptResult
         /**
          * Nonoptions, an array of unrelated values.
          *
-         * @var list<string> $nonoptions
+         * @var list<string>
          */
         protected array $nonoptions = [],
     ) {}
