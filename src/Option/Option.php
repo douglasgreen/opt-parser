@@ -201,7 +201,8 @@ abstract class Option
     protected function castDateInterval(string $input): string
     {
         try {
-            $interval = DateInterval::createFromDateString($input);
+            // @todo Remove the @ warning suppression when upgrading to PHP 8.3.
+            $interval = @DateInterval::createFromDateString($input);
         } catch (Exception) {
             // Catch a generic exception because catching DateMalformedIntervalStringException requires PHP 8.3.
             $interval = false;

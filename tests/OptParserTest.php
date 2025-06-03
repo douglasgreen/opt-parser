@@ -119,6 +119,7 @@ class OptParserTest extends TestCase
 
         $optResult = $this->optParser->parse(['test', 'remove', 'john']);
 
+        /** @phpstan-ignore method.alreadyNarrowedType */
         $this->assertNotNull($optResult->getErrors());
     }
 
