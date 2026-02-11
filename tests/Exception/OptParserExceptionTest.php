@@ -68,7 +68,7 @@ final class OptParserExceptionTest extends TestCase
 
         // Assert
         $this->assertFalse($isClientError);
-        $this->assertSame(1, $exitCode);
+        $this->assertSame(2, $exitCode);
     }
 
     public function test_validation_exception_allows_custom_exit_code(): void
