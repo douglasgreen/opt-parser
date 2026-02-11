@@ -117,6 +117,8 @@ final readonly class SyntaxParser
             }
         } else {
             $result->mappedOptions[$option->getPrimaryName()] = true;
+            // Set rawValue so it is processed during validation
+            $result->rawValues[$option->getPrimaryName()] = 'true';
         }
     }
 
@@ -154,6 +156,8 @@ final readonly class SyntaxParser
             }
         } else {
             $result->mappedOptions[$option->getPrimaryName()] = true;
+            // Set rawValue so it is processed during validation
+            $result->rawValues[$option->getPrimaryName()] = 'true';
         }
     }
 
@@ -174,7 +178,6 @@ final readonly class SyntaxParser
             }
         }
 
-        // We delegate "required" check to OptParser::validateValues()
-        // because requirement depends on command context.
+        // Delegated requirement checks to OptParser::validateValues
     }
 }

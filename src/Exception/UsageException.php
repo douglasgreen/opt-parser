@@ -16,7 +16,7 @@ final class UsageException extends OptParserException
         private readonly int $exitCode = 2,
         ?Throwable $previous = null,
     ) {
-        parent::__construct($message, 0, $previous);
+        parent::__construct($message, $exitCode, $previous);
     }
 
     public function getExitCode(): int

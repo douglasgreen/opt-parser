@@ -18,7 +18,7 @@ final readonly class OutfileType implements TypeInterface
         $dir = dirname($value);
 
         if (!is_dir($dir) || !is_writable($dir)) {
-            throw new ValidationException('Directory not writable for output file: ' . $dir);
+            throw new ValidationException('Directory not writable for output file: ' . $dir, 1);
         }
 
         return $value;

@@ -184,14 +184,18 @@ final readonly class OptParser
 
             // Check if option is required
             if ($option->isRequired()) {
-                $isAllowed = true;
+                $checkRequired = true;
 
-                // Only enforce requirement if the option is allowed for the current command
+                // Context check
                 if ($result->command !== null) {
-                    $isAllowed = $this->usageDefinition->isAllowed($result->command, $name);
+                    $checkRequired = $this->usageDefinition->isAllowed($result->command, $name);
+                } elseif (!empty($this->optionRegistry->getCommands())) {
+                    // Global context with subcommands defined: strict requirements disabled
+                    // to allow user script to handle "missing command" error.
+                    $checkRequired = false;
                 }
 
-                if ($isAllowed) {
+                if ($checkRequired) {
                     throw new UsageException(sprintf("Option '%s' is required", $name));
                 }
             }

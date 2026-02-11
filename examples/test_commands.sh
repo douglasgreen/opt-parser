@@ -67,7 +67,7 @@ run_test "Unknown command" 2 "Unknown command" unknowncmd
 run_test "Unknown option" 2 "Unknown option" add user user@test.com -p pass --unknown
 run_test "Help flag" 0 "Usage:" --help
 run_test "Version flag" 0 "User Manager" --version
-run_test "Option terminator" 0 "SUCCESS" add -- -username test@test.com -p secret123
+run_test "Option terminator" 2 "Option 'password' is required" add -- -username test@test.com -p secret123
 
 # Summary
 echo "=== Test Summary ==="
