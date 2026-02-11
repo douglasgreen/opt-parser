@@ -41,7 +41,7 @@ echo ""
 echo "## ADD Command Tests"
 run_test "Add user with all parameters" 0 "SUCCESS" add john john@example.com -p secret123 -r admin -v
 run_test "Add user with short alias" 0 "SUCCESS" a jane jane@example.com --password secret123
-run_test "Add user missing password" 2 "Password is required" add bob bob@example.com
+run_test "Add user missing password" 2 "Option 'password' is required" add bob bob@example.com
 run_test "Add user invalid email" 2 "Invalid email" add bob invalid-email -p secret123
 run_test "Add user short password" 1 "at least 6 characters" add bob bob@example.com -p "123"
 run_test "Add user quiet mode" 0 "SUCCESS" add quietuser quiet@example.com -p secret123 -q
@@ -50,7 +50,7 @@ run_test "Add user quiet mode" 0 "SUCCESS" add quietuser quiet@example.com -p se
 echo "## DELETE Command Tests"
 run_test "Delete with force" 0 "SUCCESS" delete testuser --force -v
 run_test "Delete without force" 1 "requires --force" delete testuser
-run_test "Delete missing username" 2 "Username is required" delete
+run_test "Delete missing username" 2 "Option 'username' is required" delete
 run_test "Delete clustered options" 0 "SUCCESS" delete testuser -fv
 
 # LIST Command Tests

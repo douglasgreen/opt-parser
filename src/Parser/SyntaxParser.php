@@ -174,11 +174,7 @@ final readonly class SyntaxParser
             }
         }
 
-        // Check required terms
-        foreach ($terms as $i => $term) {
-            if ($i >= $termIndex && $term->isRequired()) {
-                throw new UsageException('Missing required argument: ' . $term->getPrimaryName());
-            }
-        }
+        // We delegate "required" check to OptParser::validateValues()
+        // because requirement depends on command context.
     }
 }

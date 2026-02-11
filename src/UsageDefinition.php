@@ -59,4 +59,18 @@ final class UsageDefinition
             }
         }
     }
+
+    public function isAllowed(string $command, string $optionName): bool
+    {
+        if (!isset($this->usages[$command])) {
+            return true; // No restriction defined
+        }
+
+        // The command name itself is always allowed
+        if ($optionName === $command) {
+            return true;
+        }
+
+        return in_array($optionName, $this->usages[$command], true);
+    }
 }

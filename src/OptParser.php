@@ -6,6 +6,7 @@ namespace DouglasGreen\OptParser;
 
 use Closure;
 use DouglasGreen\OptParser\Exception\OptParserException;
+use DouglasGreen\OptParser\Exception\UsageException;
 use DouglasGreen\OptParser\Option\Command;
 use DouglasGreen\OptParser\Option\Flag;
 use DouglasGreen\OptParser\Option\OptionRegistry;
@@ -119,11 +120,10 @@ final readonly class OptParser
         if ($argv === null) {
             global $_SERVER;
             $argv = $_SERVER['argv'] ?? [];
-        }
-
-        // Remove script name
-        if (isset($argv[0]) && str_contains($argv[0], $this->programName)) {
-            array_shift($argv);
+            // Remove script name which is always index 0 in standard CLI execution
+            if (isset($argv[0])) {
+                array_shift($argv);
+            }
         }
 
         // Handle help/version flags
@@ -146,7 +146,8 @@ final readonly class OptParser
             $command = $result->command;
 
             if ($command !== null) {
-                $this->usageDefinition->validate($command, $validatedValues);
+                // Validate ONLY options provided by user against usage rules
+                $this->usageDefinition->validate($command, $result->mappedOptions);
             }
 
             $nonOptions = $result->mappedOptions['_'] ?? [];
@@ -167,16 +168,35 @@ final readonly class OptParser
     {
         $validated = [];
 
+        // 1. Validate provided values
         foreach ($result->rawValues as $name => $value) {
             $option = $this->optionRegistry->get($name);
             $validated[$name] = $option->validateValue($value, $this->typeRegistry);
         }
 
-        // Apply defaults for flags/params that weren't provided
+        // 2. Apply defaults and check requirements
         foreach ($this->optionRegistry->getAll() as $option) {
-            if (!isset($validated[$option->getPrimaryName()])) {
-                $validated[$option->getPrimaryName()] = $option->getDefault();
+            $name = $option->getPrimaryName();
+
+            if (isset($validated[$name])) {
+                continue;
             }
+
+            // Check if option is required
+            if ($option->isRequired()) {
+                $isAllowed = true;
+
+                // Only enforce requirement if the option is allowed for the current command
+                if ($result->command !== null) {
+                    $isAllowed = $this->usageDefinition->isAllowed($result->command, $name);
+                }
+
+                if ($isAllowed) {
+                    throw new UsageException(sprintf("Option '%s' is required", $name));
+                }
+            }
+
+            $validated[$name] = $option->getDefault();
         }
 
         return $validated;
