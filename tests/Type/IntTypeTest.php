@@ -15,6 +15,28 @@ use PHPUnit\Framework\TestCase;
 #[Small]
 final class IntTypeTest extends TestCase
 {
+    public static function validIntegerProvider(): iterable
+    {
+        // Note: '0' is excluded due to implementation using !filter_var() which treats 0 as falsy
+        yield 'positive integer' => ['42', 42];
+        yield 'negative integer' => ['-10', -10];
+        yield 'large number' => ['999999999', 999999999];
+        yield 'positive sign' => ['+5', 5];
+        yield 'leading spaces' => [' 12', 12];
+        yield 'trailing spaces' => ['12 ', 12];
+    }
+
+    public static function invalidIntegerProvider(): iterable
+    {
+        yield 'float string' => ['3.14'];
+        yield 'alpha' => ['abc'];
+        yield 'mixed' => ['12abc'];
+        yield 'empty' => [''];
+        yield 'octal notation' => ['0777'];
+        yield 'hex notation' => ['0x2A'];
+        yield 'internal spaces' => ['1 2'];
+    }
+
     public function test_it_returns_type_name(): void
     {
         // Arrange
@@ -40,17 +62,6 @@ final class IntTypeTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public static function validIntegerProvider(): iterable
-    {
-        // Note: '0' is excluded due to implementation using !filter_var() which treats 0 as falsy
-        yield 'positive integer' => ['42', 42];
-        yield 'negative integer' => ['-10', -10];
-        yield 'large number' => ['999999999', 999999999];
-        yield 'positive sign' => ['+5', 5];
-        yield 'leading spaces' => [' 12', 12];
-        yield 'trailing spaces' => ['12 ', 12];
-    }
-
     #[DataProvider('invalidIntegerProvider')]
     public function test_it_rejects_invalid_integers(string $input): void
     {
@@ -63,16 +74,5 @@ final class IntTypeTest extends TestCase
 
         // Act
         $type->validate($input);
-    }
-
-    public static function invalidIntegerProvider(): iterable
-    {
-        yield 'float string' => ['3.14'];
-        yield 'alpha' => ['abc'];
-        yield 'mixed' => ['12abc'];
-        yield 'empty' => [''];
-        yield 'octal notation' => ['0777'];
-        yield 'hex notation' => ['0x2A'];
-        yield 'internal spaces' => ['1 2'];
     }
 }

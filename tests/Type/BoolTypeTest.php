@@ -15,6 +15,26 @@ use PHPUnit\Framework\TestCase;
 #[Small]
 final class BoolTypeTest extends TestCase
 {
+    public static function truthyValueProvider(): iterable
+    {
+        yield 'lowercase true' => ['true'];
+        yield 'numeric one' => ['1'];
+        yield 'lowercase yes' => ['yes'];
+        yield 'lowercase on' => ['on'];
+        yield 'uppercase TRUE' => ['TRUE'];
+        yield 'mixed case True' => ['True'];
+    }
+
+    public static function falsyValueProvider(): iterable
+    {
+        yield 'lowercase false' => ['false'];
+        yield 'numeric zero' => ['0'];
+        yield 'lowercase no' => ['no'];
+        yield 'lowercase off' => ['off'];
+        yield 'empty string' => [''];
+        yield 'uppercase FALSE' => ['FALSE'];
+    }
+
     public function test_it_returns_type_name(): void
     {
         // Arrange
@@ -40,16 +60,6 @@ final class BoolTypeTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public static function truthyValueProvider(): iterable
-    {
-        yield 'lowercase true' => ['true'];
-        yield 'numeric one' => ['1'];
-        yield 'lowercase yes' => ['yes'];
-        yield 'lowercase on' => ['on'];
-        yield 'uppercase TRUE' => ['TRUE'];
-        yield 'mixed case True' => ['True'];
-    }
-
     #[DataProvider('falsyValueProvider')]
     public function test_it_validates_falsy_values(string $value): void
     {
@@ -61,16 +71,6 @@ final class BoolTypeTest extends TestCase
 
         // Assert
         $this->assertFalse($result);
-    }
-
-    public static function falsyValueProvider(): iterable
-    {
-        yield 'lowercase false' => ['false'];
-        yield 'numeric zero' => ['0'];
-        yield 'lowercase no' => ['no'];
-        yield 'lowercase off' => ['off'];
-        yield 'empty string' => [''];
-        yield 'uppercase FALSE' => ['FALSE'];
     }
 
     public function test_it_throws_for_invalid_boolean_strings(): void

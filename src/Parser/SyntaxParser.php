@@ -30,7 +30,7 @@ final readonly class SyntaxParser
         $currentOption = null;
         $operandOnly = false;
 
-        foreach ($tokens as $index => $token) {
+        foreach ($tokens as $token) {
             // If we were expecting a value for previous option, consume this token
             if ($expectingValue && $currentOption instanceof OptionInterface) {
                 if ($token->type === TokenType::OPERAND || $token->type === TokenType::VALUE) {
@@ -39,9 +39,8 @@ final readonly class SyntaxParser
                     $expectingValue = false;
                     $currentOption = null;
                     continue;
-                } else {
-                    throw new UsageException(sprintf("Option '%s' requires a value", $currentOption->getPrimaryName()));
                 }
+                throw new UsageException(sprintf("Option '%s' requires a value", $currentOption->getPrimaryName()));
             }
 
             if ($token->type === TokenType::TERMINATOR) {

@@ -7,6 +7,7 @@ namespace Tests\Unit\Option;
 use DouglasGreen\OptParser\Exception\ValidationException;
 use DouglasGreen\OptParser\Option\Param;
 use DouglasGreen\OptParser\Type\TypeRegistry;
+use Exception;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
@@ -129,7 +130,7 @@ final class ParamTest extends TestCase
         // Arrange
         $filter = function (string $value): string {
             if (strlen($value) < 5) {
-                throw new \Exception('Too short');
+                throw new Exception('Too short');
             }
             return $value;
         };

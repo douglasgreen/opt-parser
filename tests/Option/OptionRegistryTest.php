@@ -8,7 +8,6 @@ use DouglasGreen\OptParser\Exception\UsageException;
 use DouglasGreen\OptParser\Option\Command;
 use DouglasGreen\OptParser\Option\Flag;
 use DouglasGreen\OptParser\Option\OptionRegistry;
-use DouglasGreen\OptParser\Option\Param;
 use DouglasGreen\OptParser\Option\Term;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;

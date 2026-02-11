@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 declare(strict_types=1);
 
 use DouglasGreen\OptParser\OptParser;
@@ -42,7 +43,7 @@ $optParser
 try {
     $input = $optParser->parse();
 } catch (Exception $e) {
-    fwrite(STDERR, "Error: " . $e->getMessage() . "\n");
+    fwrite(STDERR, 'Error: ' . $e->getMessage() . "\n");
     exit($e->getCode() ?: 2);
 }
 
@@ -58,7 +59,7 @@ if ($command === null) {
 $quiet = $input->get('quiet') ?? false;
 $verbose = $input->get('verbose') ?? false;
 
-$output = function(string $message, bool $isError = false) use ($quiet): void {
+$output = function (string $message, bool $isError = false) use ($quiet): void {
     if ($quiet && !$isError) {
         return;
     }
@@ -72,87 +73,87 @@ switch ($command) {
         $email = $input->get('email');
         $password = $input->get('password');
         $role = $input->get('role') ?? 'user';
-        
+
         if ($verbose) {
-            $output("Operation: ADD");
+            $output('Operation: ADD');
             $output("  Username: $username");
-            $output("  Email: " . ($email ?? 'N/A'));
+            $output('  Email: ' . ($email ?? 'N/A'));
             $output("  Role: $role");
-            $output("  Password: " . ($password ? str_repeat('*', strlen($password)) : 'N/A'));
+            $output('  Password: ' . ($password ? str_repeat('*', strlen($password)) : 'N/A'));
         }
-        
+
         if (!$password) {
-            $output("Error: Password is required. Use -p or --password", true);
+            $output('Error: Password is required. Use -p or --password', true);
             exit(2);
         }
-        
+
         // Validate password length
         if (strlen($password) < 6) {
-            $output("Error: Password must be at least 6 characters", true);
+            $output('Error: Password must be at least 6 characters', true);
             exit(1);
         }
-        
+
         $output("SUCCESS: Added user '$username' with role '$role'");
         exit(0);
-        
+
     case 'delete':
         $username = $input->get('username');
         $force = $input->get('force') ?? false;
-        
+
         if (!$username) {
-            $output("Error: Username is required for delete operation", true);
+            $output('Error: Username is required for delete operation', true);
             exit(2);
         }
-        
+
         if ($verbose) {
-            $output("Operation: DELETE");
+            $output('Operation: DELETE');
             $output("  Username: $username");
-            $output("  Force: " . ($force ? 'yes' : 'no'));
+            $output('  Force: ' . ($force ? 'yes' : 'no'));
         }
-        
+
         if (!$force) {
-            $output("WARNING: Deletion requires --force flag for safety");
+            $output('WARNING: Deletion requires --force flag for safety');
             $output("To delete '$username', run: delete $username --force");
             exit(1);
         }
-        
+
         $output("SUCCESS: Deleted user '$username'");
         exit(0);
-        
+
     case 'list':
         $outputFile = $input->get('output');
-        
+
         if ($verbose) {
-            $output("Operation: LIST");
-            $output("  Output: " . ($outputFile ?? 'stdout'));
+            $output('Operation: LIST');
+            $output('  Output: ' . ($outputFile ?? 'stdout'));
         }
-        
+
         $users = [
             ['username' => 'admin', 'role' => 'admin', 'email' => 'admin@example.com'],
             ['username' => 'john_doe', 'role' => 'user', 'email' => 'john@example.com'],
             ['username' => 'jane_smith', 'role' => 'editor', 'email' => 'jane@example.com'],
         ];
-        
+
         $lines = [];
         foreach ($users as $user) {
             if ($verbose) {
-                $lines[] = sprintf("%-15s %-10s %s", $user['username'], $user['role'], $user['email']);
+                $lines[] = sprintf('%-15s %-10s %s', $user['username'], $user['role'], $user['email']);
             } else {
                 $lines[] = $user['username'];
             }
         }
-        
+
         $content = implode("\n", $lines) . "\n";
-        
+
         if ($outputFile) {
             file_put_contents($outputFile, $content);
-            $output("SUCCESS: Listed " . count($users) . " users to '$outputFile'");
+            $output('SUCCESS: Listed ' . count($users) . " users to '$outputFile'");
         } else {
             echo $content;
-            $output("SUCCESS: Listed " . count($users) . " users");
+            $output('SUCCESS: Listed ' . count($users) . ' users');
         }
         exit(0);
-        
+
     default:
         $output("Error: Unknown command '$command'", true);
         exit(2);

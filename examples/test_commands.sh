@@ -14,13 +14,13 @@ run_test() {
     shift
     local expected_pattern="$1"
     shift
-    
+
     echo "Testing: $description"
     echo "  Command: $SCRIPT $*"
-    
+
     output=$($SCRIPT "$@" 2>&1)
     exit_code=$?
-    
+
     if [ $exit_code -eq $expected_exit ] && echo "$output" | grep -q "$expected_pattern"; then
         echo "  ✓ PASS"
         ((PASSED++))
@@ -62,7 +62,7 @@ run_test "List invalid path" 1 "Directory not writable" list -o /nonexistent/pat
 
 # Edge Cases
 echo "## Edge Cases"
-run_test "No command" 2 "No command specified" 
+run_test "No command" 2 "No command specified"
 run_test "Unknown command" 2 "Unknown command" unknowncmd
 run_test "Unknown option" 2 "Unknown option" add user user@test.com -p pass --unknown
 run_test "Help flag" 0 "Usage:" --help

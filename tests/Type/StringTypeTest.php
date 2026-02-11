@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Type;
 
-use DouglasGreen\OptParser\Exception\ValidationException;
 use DouglasGreen\OptParser\Type\StringType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Small;

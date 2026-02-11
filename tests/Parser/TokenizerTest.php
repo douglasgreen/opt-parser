@@ -16,6 +16,13 @@ use PHPUnit\Framework\TestCase;
 #[Small]
 final class TokenizerTest extends TestCase
 {
+    public static function numericEdgeCaseProvider(): iterable
+    {
+        // When rest is all digits, it's treated as clustered flags, not attached value
+        yield 'numeric attached value' => ['-o123', ['o', '1', '2', '3']];
+        yield 'numeric flags' => ['-123', ['1', '2', '3']];
+    }
+
     public function test_it_tokenizes_empty_array(): void
     {
         // Arrange
@@ -198,12 +205,5 @@ final class TokenizerTest extends TestCase
 
         // Assert
         $this->assertSame($expectedValues, $actualValues);
-    }
-
-    public static function numericEdgeCaseProvider(): iterable
-    {
-        // When rest is all digits, it's treated as clustered flags, not attached value
-        yield 'numeric attached value' => ['-o123', ['o', '1', '2', '3']];
-        yield 'numeric flags' => ['-123', ['1', '2', '3']];
     }
 }

@@ -12,11 +12,11 @@ use DouglasGreen\OptParser\Type\TypeRegistry;
 abstract readonly class AbstractOption implements OptionInterface
 {
     /** @var list<string> */
-    protected readonly array $names;
+    protected array $names;
 
     public function __construct(
         array $names,
-        protected readonly string $description,
+        protected string $description,
     ) {
         $this->names = array_values($names);
     }

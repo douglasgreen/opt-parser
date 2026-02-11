@@ -15,6 +15,23 @@ use PHPUnit\Framework\TestCase;
 #[Small]
 final class EmailTypeTest extends TestCase
 {
+    public static function validEmailProvider(): iterable
+    {
+        yield 'simple gmail' => ['user@gmail.com'];
+        yield 'with subdomain' => ['user@mail.example.com'];
+        yield 'with plus' => ['user+tag@example.com'];
+        yield 'with dots' => ['first.last@example.co.uk'];
+    }
+
+    public static function invalidEmailProvider(): iterable
+    {
+        yield 'missing at' => ['userexample.com'];
+        yield 'missing domain' => ['user@'];
+        yield 'missing user' => ['@example.com'];
+        yield 'spaces' => ['user name@example.com'];
+        yield 'empty string' => [''];
+    }
+
     public function test_it_returns_type_name(): void
     {
         // Arrange
@@ -40,14 +57,6 @@ final class EmailTypeTest extends TestCase
         $this->assertSame($email, $result);
     }
 
-    public static function validEmailProvider(): iterable
-    {
-        yield 'simple gmail' => ['user@gmail.com'];
-        yield 'with subdomain' => ['user@mail.example.com'];
-        yield 'with plus' => ['user+tag@example.com'];
-        yield 'with dots' => ['first.last@example.co.uk'];
-    }
-
     #[DataProvider('invalidEmailProvider')]
     public function test_it_rejects_invalid_emails(string $invalidEmail): void
     {
@@ -60,14 +69,5 @@ final class EmailTypeTest extends TestCase
 
         // Act
         $type->validate($invalidEmail);
-    }
-
-    public static function invalidEmailProvider(): iterable
-    {
-        yield 'missing at' => ['userexample.com'];
-        yield 'missing domain' => ['user@'];
-        yield 'missing user' => ['@example.com'];
-        yield 'spaces' => ['user name@example.com'];
-        yield 'empty string' => [''];
     }
 }
