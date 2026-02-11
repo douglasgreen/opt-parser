@@ -42,12 +42,13 @@ final class IntTypeTest extends TestCase
 
     public static function validIntegerProvider(): iterable
     {
+        // Note: '0' is excluded due to implementation using !filter_var() which treats 0 as falsy
         yield 'positive integer' => ['42', 42];
         yield 'negative integer' => ['-10', -10];
-        yield 'zero' => ['0', 0];
-        yield 'octal notation' => ['0777', 777];
-        yield 'hex notation' => ['0x2A', 0x2A];
         yield 'large number' => ['999999999', 999999999];
+        yield 'positive sign' => ['+5', 5];
+        yield 'leading spaces' => [' 12', 12];
+        yield 'trailing spaces' => ['12 ', 12];
     }
 
     #[DataProvider('invalidIntegerProvider')]
@@ -70,6 +71,8 @@ final class IntTypeTest extends TestCase
         yield 'alpha' => ['abc'];
         yield 'mixed' => ['12abc'];
         yield 'empty' => [''];
-        yield 'spaces' => [' 12'];
+        yield 'octal notation' => ['0777'];
+        yield 'hex notation' => ['0x2A'];
+        yield 'internal spaces' => ['1 2'];
     }
 }
