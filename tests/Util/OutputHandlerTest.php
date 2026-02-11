@@ -18,11 +18,11 @@ final class OutputHandlerTest extends TestCase
     {
         // Arrange
         $handler = new OutputHandler();
-        
+
         // We can't easily test actual output without capturing streams
         // So we verify the method exists and accepts the right parameters
         $this->assertTrue(method_exists($handler, 'stdout'));
-        
+
         // Act & Assert (smoke test - should not throw)
         $handler->stdout('Test');
         $this->assertTrue(true);
@@ -32,10 +32,10 @@ final class OutputHandlerTest extends TestCase
     {
         // Arrange
         $handler = new OutputHandler();
-        
+
         // Assert method exists
         $this->assertTrue(method_exists($handler, 'stderr'));
-        
+
         // Act & Assert (smoke test)
         $handler->stderr('Error');
         $this->assertTrue(true);

@@ -110,7 +110,7 @@ final class OptionRegistryTest extends TestCase
         $registry = new OptionRegistry();
         $flag1 = new Flag(['verbose', 'v'], 'Verbose');
         $flag2 = new Flag(['debug', 'd'], 'Debug');
-        
+
         $registry->register($flag1);
         $registry->register($flag2);
 
@@ -130,7 +130,7 @@ final class OptionRegistryTest extends TestCase
         $cmd1 = new Command(['add', 'a'], 'Add');
         $cmd2 = new Command(['delete'], 'Delete');
         $flag = new Flag(['verbose'], 'Verbose');
-        
+
         $registry->register($cmd1);
         $registry->register($cmd2);
         $registry->register($flag);
@@ -151,7 +151,7 @@ final class OptionRegistryTest extends TestCase
         $term1 = new Term('file', 'File path', 'STRING');
         $term2 = new Term('count', 'Count', 'INT');
         $flag = new Flag(['verbose'], 'Verbose');
-        
+
         $registry->register($term1);
         $registry->register($term2);
         $registry->register($flag);

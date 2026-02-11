@@ -168,7 +168,7 @@ final class TokenizerTest extends TestCase
         // Act
         $this->assertFalse($tokenizer->isTerminated());
         $tokenizer->tokenize(['--', 'arg']);
-        
+
         // Assert
         $this->assertTrue($tokenizer->isTerminated());
     }

@@ -30,19 +30,45 @@ final readonly class SyntaxParser
         $currentOption = null;
         $operandOnly = false;
 
-        foreach ($tokens as $token) {
+        foreach ($tokens as $index => $token) {
+            // If we were expecting a value for previous option, consume this token
+            if ($expectingValue && $currentOption instanceof OptionInterface) {
+                if ($token->type === TokenType::OPERAND || $token->type === TokenType::VALUE) {
+                    $result->mappedOptions[$currentOption->getPrimaryName()] = $token->value;
+                    $result->rawValues[$currentOption->getPrimaryName()] = $token->value;
+                    $expectingValue = false;
+                    $currentOption = null;
+                    continue;
+                } else {
+                    throw new UsageException(sprintf("Option '%s' requires a value", $currentOption->getPrimaryName()));
+                }
+            }
+
             if ($token->type === TokenType::TERMINATOR) {
                 $operandOnly = true;
                 continue;
             }
 
             if ($operandOnly || $token->type === TokenType::OPERAND) {
+                // Check if this operand is actually a command
+                if ($result->command === null) {
+                    try {
+                        $potentialOption = $this->optionRegistry->get($token->value);
+                        if ($potentialOption instanceof Command) {
+                            $result->command = $potentialOption->getPrimaryName();
+                            continue;
+                        }
+                    } catch (UsageException) {
+                        // Not a known option/command, treat as operand
+                    }
+                }
+
                 $result->operands[] = $token->value;
                 continue;
             }
 
             if ($token->type === TokenType::LONG_OPTION) {
-                $this->parseLongOption($token, $result);
+                $this->parseLongOption($token, $result, $expectingValue, $currentOption);
                 continue;
             }
 
@@ -62,7 +88,7 @@ final readonly class SyntaxParser
         return $result;
     }
 
-    private function parseLongOption(Token $token, ParsingResult $result): void
+    private function parseLongOption(Token $token, ParsingResult $result, bool &$expectingValue, ?OptionInterface &$currentOption): void
     {
         $name = $token->value;
 
@@ -77,7 +103,7 @@ final readonly class SyntaxParser
                 throw new UsageException('Multiple commands specified');
             }
 
-            $result->command = $name;
+            $result->command = $option->getPrimaryName();
             return;
         }
 
@@ -86,7 +112,9 @@ final readonly class SyntaxParser
                 $result->mappedOptions[$option->getPrimaryName()] = $token->attachedValue;
                 $result->rawValues[$option->getPrimaryName()] = $token->attachedValue;
             } else {
-                throw new UsageException(sprintf("Option '--%s' requires a value", $name));
+                // Set flag to consume next token as value
+                $expectingValue = true;
+                $currentOption = $option;
             }
         } else {
             $result->mappedOptions[$option->getPrimaryName()] = true;
@@ -112,7 +140,7 @@ final readonly class SyntaxParser
                 throw new UsageException('Multiple commands specified');
             }
 
-            $result->command = $name;
+            $result->command = $option->getPrimaryName();
             return;
         }
 
@@ -121,6 +149,7 @@ final readonly class SyntaxParser
                 $result->mappedOptions[$option->getPrimaryName()] = $token->attachedValue;
                 $result->rawValues[$option->getPrimaryName()] = $token->attachedValue;
             } else {
+                // Set flag to consume next token as value
                 $expectingValue = true;
                 $currentOption = $option;
             }

@@ -82,16 +82,16 @@ $optParser
     ->addCommand(['add', 'a'], 'Add a new user')
     ->addCommand(['delete', 'd'], 'Delete an existing user')
     ->addCommand(['list', 'l'], 'List all users')
-    
+
     // Terms (positional arguments)
     ->addTerm('username', 'STRING', 'Username of the user')
     ->addTerm('email', 'EMAIL', 'Email address of the user')
-    
+
     // Parameters (named arguments with values)
     ->addParam(['password', 'p'], 'STRING', 'Password for the user')
     ->addParam(['role', 'r'], 'STRING', 'Role of the user')
     ->addParam(['output', 'o'], 'OUTFILE', 'Output file path')
-    
+
     // Flags (boolean switches)
     ->addFlag(['verbose', 'v'], 'Enable verbose output')
     ->addFlag(['quiet', 'q'], 'Suppress non-error output')
@@ -122,16 +122,16 @@ switch ($command) {
         $password = $input->get('password');
         $role = $input->get('role') ?? 'user';
         $verbose = $input->get('verbose') ?? false;
-        
+
         // Implementation...
         break;
-        
+
     case 'delete':
         $username = $input->get('username');
         $force = $input->get('force') ?? false;
         // Implementation...
         break;
-        
+
     case 'list':
         $output = $input->get('output');
         $verbose = $input->get('verbose') ?? false;
