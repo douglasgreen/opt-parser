@@ -29,11 +29,13 @@
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.93.1",
         "phpstan/phpstan": "^2.1.38",
+        "phpunit/phpunit": "^12.5.8",
         "rector/rector": "^2.3.6"
     },
     "autoload": {
         "psr-4": {
-            "DouglasGreen\\OptParser\\": "src/"
+            "DouglasGreen\\OptParser\\": "src/",
+            "Tests\\Unit\\": "tests/"
         }
     },
     "config": {
@@ -48,6 +50,7 @@
         "lint:fix": [
             "php-cs-fixer fix",
             "rector process"
-        ]
+        ],
+        "test": ["phpunit"]
     }
 }

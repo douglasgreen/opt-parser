@@ -9,7 +9,7 @@ use DouglasGreen\OptParser\Type\TypeRegistry;
 /**
  * Base implementation for options with common functionality.
  */
-abstract class AbstractOption implements OptionInterface
+abstract readonly class AbstractOption implements OptionInterface
 {
     /** @var list<string> */
     protected readonly array $names;
