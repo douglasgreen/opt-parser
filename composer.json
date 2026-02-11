@@ -41,14 +41,13 @@
     },
     "scripts": {
         "lint": [
-            "detect-collisions",
-            "ecs",
+            "php-cs-fixer fix --dry-run --verbose",
             "phpstan analyse",
-            "rector --dry-run"
+            "rector process --dry-run"
         ],
         "lint:fix": [
-            "ecs --fix",
-            "rector"
+            "php-cs-fixer fix",
+            "rector process"
         ]
     }
 }
