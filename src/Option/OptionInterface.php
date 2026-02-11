@@ -12,7 +12,9 @@ use DouglasGreen\OptParser\Type\TypeRegistry;
  */
 interface OptionInterface
 {
-    /** @return list<string> */
+    /**
+     * @return list<string>
+     */
     public function getNames(): array;
 
     public function getPrimaryName(): string;
@@ -23,7 +25,9 @@ interface OptionInterface
 
     public function isRequired(): bool;
 
-    /** @throws ValidationException */
+    /**
+     * @throws ValidationException
+     */
     public function validateValue(string $value, TypeRegistry $registry): mixed;
 
     public function getDefault(): mixed;

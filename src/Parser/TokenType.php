@@ -10,9 +10,14 @@ namespace DouglasGreen\OptParser\Parser;
 enum TokenType
 {
     case SHORT_OPTION;      // -a
+
     case LONG_OPTION;       // --option
+
     case AGGREGATED_SHORT;  // -abc (clustered)
+
     case VALUE;             // argument to option
+
     case TERMINATOR;        // --
+
     case OPERAND;           // positional argument
 }

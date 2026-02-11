@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser\Option;
 
-use DouglasGreen\OptParser\Exception\ValidationException;
 use DouglasGreen\OptParser\Type\TypeRegistry;
 
 /**

@@ -13,6 +13,7 @@ final class Tokenizer
 
     /**
      * @param array<int, string> $argv
+     *
      * @return list<Token>
      */
     public function tokenize(array $argv): array
@@ -45,6 +46,11 @@ final class Tokenizer
         }
 
         return $tokens;
+    }
+
+    public function isTerminated(): bool
+    {
+        return $this->terminated;
     }
 
     private function tokenizeLongOption(string $arg, array &$tokens): void
@@ -84,10 +90,5 @@ final class Tokenizer
             }
             $tokens[] = new Token(TokenType::SHORT_OPTION, $chars[$len - 1]);
         }
-    }
-
-    public function isTerminated(): bool
-    {
-        return $this->terminated;
     }
 }

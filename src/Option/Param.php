@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser\Option;
 
+use Closure;
 use DouglasGreen\OptParser\Exception\ValidationException;
 use DouglasGreen\OptParser\Type\TypeRegistry;
+use Exception;
 
 /**
  * Option requiring a value (e.g., -o file or --output=file).
@@ -18,7 +20,7 @@ final readonly class Param extends AbstractOption
         private readonly string $typeName,
         private readonly bool $required = false,
         private readonly mixed $default = null,
-        private readonly ?\Closure $filter = null,
+        private readonly ?Closure $filter = null,
     ) {
         parent::__construct($names, $description);
     }
@@ -46,9 +48,9 @@ final readonly class Param extends AbstractOption
         if ($this->filter !== null) {
             try {
                 $typedValue = ($this->filter)($typedValue);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 throw new ValidationException(
-                    "Filter rejected value for '{$this->getPrimaryName()}': {$e->getMessage()}"
+                    "Filter rejected value for '{$this->getPrimaryName()}': {$e->getMessage()}",
                 );
             }
         }

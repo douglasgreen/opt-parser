@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DouglasGreen\OptParser\Option;
 
 use DouglasGreen\OptParser\Exception\UsageException;
+use InvalidArgumentException;
 
 /**
  * Registry for storing and retrieving option definitions.
@@ -28,7 +29,7 @@ final class OptionRegistry
         $names = $option->getNames();
 
         if ($names === []) {
-            throw new \InvalidArgumentException('Option must have at least one name');
+            throw new InvalidArgumentException('Option must have at least one name');
         }
 
         $primary = $names[0];
@@ -37,7 +38,7 @@ final class OptionRegistry
             $key = $this->normalizeName($name);
 
             if (isset($this->options[$key])) {
-                throw new \InvalidArgumentException("Option name conflict: {$name}");
+                throw new InvalidArgumentException("Option name conflict: {$name}");
             }
 
             $this->options[$key] = $option;

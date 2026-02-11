@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser\Option;
 
+use Closure;
 use DouglasGreen\OptParser\Exception\ValidationException;
 use DouglasGreen\OptParser\Type\TypeRegistry;
+use Exception;
 
 /**
  * Positional argument (term).
@@ -17,7 +19,7 @@ final readonly class Term extends AbstractOption
         string $description,
         private readonly string $typeName,
         private readonly bool $required = true,
-        private readonly ?\Closure $filter = null,
+        private readonly ?Closure $filter = null,
     ) {
         parent::__construct([$name], $description);
     }
@@ -40,9 +42,9 @@ final readonly class Term extends AbstractOption
         if ($this->filter !== null) {
             try {
                 $typedValue = ($this->filter)($typedValue);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 throw new ValidationException(
-                    "Filter rejected value for '{$this->getPrimaryName()}': {$e->getMessage()}"
+                    "Filter rejected value for '{$this->getPrimaryName()}': {$e->getMessage()}",
                 );
             }
         }

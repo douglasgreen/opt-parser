@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser;
 
+use Closure;
 use DouglasGreen\OptParser\Exception\OptParserException;
-use DouglasGreen\OptParser\Exception\UsageException;
-use DouglasGreen\OptParser\Exception\ValidationException;
 use DouglasGreen\OptParser\Option\Command;
 use DouglasGreen\OptParser\Option\Flag;
 use DouglasGreen\OptParser\Option\OptionRegistry;
@@ -24,10 +23,15 @@ use DouglasGreen\OptParser\Util\SignalHandler;
 final class OptParser
 {
     private OptionRegistry $optionRegistry;
+
     private TypeRegistry $typeRegistry;
+
     private Tokenizer $tokenizer;
+
     private UsageDefinition $usageDefinition;
+
     private ?SignalHandler $signalHandler;
+
     private OutputHandler $outputHandler;
 
     public function __construct(
@@ -59,12 +63,12 @@ final class OptParser
         array $names,
         string $type,
         string $description,
-        ?\Closure $filter = null,
+        ?Closure $filter = null,
         bool $required = false,
-        mixed $default = null
+        mixed $default = null,
     ): self {
         $this->optionRegistry->register(
-            new Param($names, $description, $type, $required, $default, $filter)
+            new Param($names, $description, $type, $required, $default, $filter),
         );
         return $this;
     }
@@ -83,10 +87,10 @@ final class OptParser
         string $type,
         string $description,
         bool $required = true,
-        ?\Closure $filter = null
+        ?Closure $filter = null,
     ): self {
         $this->optionRegistry->register(
-            new Term($name, $description, $type, $required, $filter)
+            new Term($name, $description, $type, $required, $filter),
         );
         return $this;
     }
@@ -104,6 +108,7 @@ final class OptParser
      * Parse command line arguments.
      *
      * @param array<int, string>|null $argv If null, uses global $argv
+     *
      * @throws OptParserException on parsing or validation errors
      */
     public function parse(?array $argv = null): Input
@@ -150,6 +155,11 @@ final class OptParser
             $this->outputHandler->stderr('error: ' . $e->getMessage());
             throw $e;
         }
+    }
+
+    public function getVersion(): string
+    {
+        return $this->version;
     }
 
     private function validateValues(\DouglasGreen\OptParser\Parser\ParsingResult $result): array
@@ -237,10 +247,5 @@ final class OptParser
     private function printVersion(): void
     {
         $this->outputHandler->stdout("{$this->programName} {$this->version}");
-    }
-
-    public function getVersion(): string
-    {
-        return $this->version;
     }
 }

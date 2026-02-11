@@ -30,6 +30,7 @@ final class UsageDefinition
      * Validates that the given options are compatible with the command.
      *
      * @param array<string, mixed> $providedOptions
+     *
      * @throws Exception\UsageException if invalid combination
      */
     public function validate(string $command, array $providedOptions, Option\OptionRegistry $registry): void
@@ -47,7 +48,7 @@ final class UsageDefinition
 
             if (!in_array($name, $allowed, true)) {
                 throw new Exception\UsageException(
-                    "Option '{$name}' is not allowed with command '{$command}'"
+                    "Option '{$name}' is not allowed with command '{$command}'",
                 );
             }
         }

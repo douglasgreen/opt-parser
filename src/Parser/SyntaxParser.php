@@ -9,7 +9,6 @@ use DouglasGreen\OptParser\Option\Command;
 use DouglasGreen\OptParser\Option\OptionInterface;
 use DouglasGreen\OptParser\Option\OptionRegistry;
 use DouglasGreen\OptParser\Option\Param;
-use DouglasGreen\OptParser\Option\Term;
 
 /**
  * POSIX.1-2017 compliant syntax parser.
@@ -22,6 +21,7 @@ final readonly class SyntaxParser
 
     /**
      * @param list<Token> $tokens
+     *
      * @throws UsageException on syntax violations
      */
     public function parse(array $tokens): ParsingResult
@@ -97,7 +97,7 @@ final readonly class SyntaxParser
         Token $token,
         ParsingResult $result,
         bool &$expectingValue,
-        ?OptionInterface &$currentOption
+        ?OptionInterface &$currentOption,
     ): void {
         $name = $token->value;
 

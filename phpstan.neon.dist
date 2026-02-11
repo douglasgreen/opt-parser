@@ -7,8 +7,4 @@ parameters:
     paths:
         - .php-cs-fixer.php
         - rector.php
-        - register-error-handler.php
-        - bin
-        - public
         - src
-        - tests

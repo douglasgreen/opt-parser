@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser\Type;
 
+use DateInterval;
 use DouglasGreen\OptParser\Exception\ValidationException;
+use Exception;
 
 final readonly class IntervalType implements TypeInterface
 {
@@ -16,9 +18,9 @@ final readonly class IntervalType implements TypeInterface
     public function validate(string $value): string
     {
         try {
-            new \DateInterval($value);
+            new DateInterval($value);
             return $value;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ValidationException("Invalid interval: {$value}");
         }
     }

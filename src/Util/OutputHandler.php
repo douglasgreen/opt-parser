@@ -12,6 +12,7 @@ use Psr\Log\LoggerInterface;
 final class OutputHandler
 {
     private bool $isTty;
+
     private bool $noColor;
 
     public function __construct(
