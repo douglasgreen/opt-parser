@@ -1,0 +1,14 @@
+parameters:
+    level: 8
+    tmpDir: ./var/cache/phpstan
+    phpVersion: 80300
+    treatPhpDocTypesAsCertain: false
+
+    paths:
+        - .php-cs-fixer.php
+        - rector.php
+        - register-error-handler.php
+        - bin
+        - public
+        - src
+        - tests

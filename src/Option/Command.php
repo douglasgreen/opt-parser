@@ -4,22 +4,23 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser\Option;
 
-class Command extends Option
+/**
+ * Subcommand selector (e.g., git clone, git push).
+ */
+final readonly class Command extends AbstractOption
 {
-    /**
-     * @param list<string> $aliases
-     */
-    public function __construct(string $name, string $desc, array $aliases)
+    public function acceptsValue(): bool
     {
-        parent::__construct($name, $desc);
-        foreach ($aliases as $alias) {
-            $this->addAlias($alias);
-        }
+        return false;
     }
 
-    #[\Override]
-    public function write(): string
+    public function validateValue(string $value, \DouglasGreen\OptParser\Type\TypeRegistry $registry): string
     {
-        return $this->name;
+        return $value;
+    }
+
+    public function getDefault(): ?string
+    {
+        return null;
     }
 }

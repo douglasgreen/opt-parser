@@ -4,22 +4,26 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser\Option;
 
-class Flag extends Option
+use DouglasGreen\OptParser\Exception\ValidationException;
+use DouglasGreen\OptParser\Type\TypeRegistry;
+
+/**
+ * Boolean flag without argument (e.g., -v, --verbose).
+ */
+final readonly class Flag extends AbstractOption
 {
-    /**
-     * @param list<string> $aliases
-     */
-    public function __construct(string $name, string $desc, array $aliases)
+    public function acceptsValue(): bool
     {
-        parent::__construct($name, $desc);
-        foreach ($aliases as $alias) {
-            $this->addAlias($alias);
-        }
+        return false;
     }
 
-    #[\Override]
-    public function write(): string
+    public function validateValue(string $value, TypeRegistry $registry): true
     {
-        return $this->hyphenate($this->name);
+        return true;
+    }
+
+    public function getDefault(): bool
+    {
+        return false;
     }
 }

@@ -1,0 +1,1 @@
+/home/dsg/github/opt-parser/vendor/douglasgreen/config-setup/rector.php

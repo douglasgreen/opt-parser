@@ -4,444 +4,243 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser;
 
-use DouglasGreen\Utility\Data\ArgumentException;
-use DouglasGreen\Utility\Data\ValueException;
+use DouglasGreen\OptParser\Exception\OptParserException;
+use DouglasGreen\OptParser\Exception\UsageException;
+use DouglasGreen\OptParser\Exception\ValidationException;
+use DouglasGreen\OptParser\Option\Command;
+use DouglasGreen\OptParser\Option\Flag;
+use DouglasGreen\OptParser\Option\OptionRegistry;
+use DouglasGreen\OptParser\Option\Param;
+use DouglasGreen\OptParser\Option\Term;
+use DouglasGreen\OptParser\Parser\SyntaxParser;
+use DouglasGreen\OptParser\Parser\Tokenizer;
+use DouglasGreen\OptParser\Type\TypeRegistry;
+use DouglasGreen\OptParser\Util\OutputHandler;
+use DouglasGreen\OptParser\Util\SignalHandler;
 
 /**
- * Define a program with a series of usage options.
- * @see \DouglasGreen\OptParser\Tests\OptParserTest
+ * Main API for POSIX-compliant command-line parsing.
  */
-class OptParser
+final class OptParser
 {
-    public const DEBUG_MODE = 1;
-
-    public const SKIP_RESULT_CHECK = 1;
-
-    protected ArgParser $argParser;
-
-    protected OptHandler $optHandler;
-
-    /**
-     * @var list<Usage>
-     */
-    protected array $usages = [];
-
-    /**
-     * @var bool All non-help usages have commands. If allCommands is false,
-     * that means there are no commands because a program with only one usage
-     * that has a command would also be allCommands = true.
-     */
-    protected bool $allCommands = true;
+    private OptionRegistry $optionRegistry;
+    private TypeRegistry $typeRegistry;
+    private Tokenizer $tokenizer;
+    private UsageDefinition $usageDefinition;
+    private ?SignalHandler $signalHandler;
+    private OutputHandler $outputHandler;
 
     public function __construct(
-        protected string $name,
-        protected string $desc,
-        protected int $flags = 0,
+        private readonly string $programName,
+        private readonly string $description,
+        private readonly string $version = '1.0.0',
     ) {
-        $this->optHandler = new OptHandler();
-
-        // Add a default help usage.
-        $this->usages[] = new Usage($this->optHandler, ['help']);
+        $this->optionRegistry = new OptionRegistry();
+        $this->typeRegistry = new TypeRegistry();
+        $this->tokenizer = new Tokenizer();
+        $this->usageDefinition = new UsageDefinition();
+        $this->outputHandler = new OutputHandler();
+        $this->signalHandler = new SignalHandler($this->outputHandler);
     }
 
     /**
-     * A command is a predefined list of command words.
-     *
-     * @param list<string> $aliases
-     *
-     * @throws ValueException
+     * @param array{0: string, 1?: string} $names
      */
-    public function addCommand(array $aliases, string $desc): self
+    public function addCommand(array $names, string $description): self
     {
-        if (count($this->usages) > 1) {
-            throw new ValueException('Cannot add commands after usages');
-        }
-
-        $this->optHandler->addCommand($aliases, $desc);
-
+        $this->optionRegistry->register(new Command($names, $description));
         return $this;
     }
 
     /**
-     * A flag has no arguments.
-     *
-     * @param list<string> $aliases
-     *
-     * @throws ValueException
-     */
-    public function addFlag(array $aliases, string $desc): self
-    {
-        if (count($this->usages) > 1) {
-            throw new ValueException('Cannot add flags after usages');
-        }
-
-        $this->optHandler->addFlag($aliases, $desc);
-
-        return $this;
-    }
-
-    /**
-     * A parameter has a required argument.
-     *
-     * @param list<string> $aliases
-     *
-     * @throws ValueException
+     * @param array{0: string, 1?: string} $names
      */
     public function addParam(
-        array $aliases,
+        array $names,
         string $type,
-        string $desc,
-        ?callable $callback = null,
+        string $description,
+        ?\Closure $filter = null,
+        bool $required = false,
+        mixed $default = null
     ): self {
-        if (count($this->usages) > 1) {
-            throw new ValueException('Cannot add params after usages');
-        }
-
-        $this->optHandler->addParam($aliases, $type, $desc, $callback);
-
+        $this->optionRegistry->register(
+            new Param($names, $description, $type, $required, $default, $filter)
+        );
         return $this;
     }
 
     /**
-     * A term is a positional argument.
-     *
-     * @throws ValueException
+     * @param array{0: string, 1?: string} $names
      */
+    public function addFlag(array $names, string $description): self
+    {
+        $this->optionRegistry->register(new Flag($names, $description));
+        return $this;
+    }
+
     public function addTerm(
         string $name,
         string $type,
-        string $desc,
-        ?callable $callback = null,
+        string $description,
+        bool $required = true,
+        ?\Closure $filter = null
     ): self {
-        if (count($this->usages) > 1) {
-            throw new ValueException('Cannot add terms after usages');
-        }
-
-        $this->optHandler->addTerm($name, $type, $desc, $callback);
-
+        $this->optionRegistry->register(
+            new Term($name, $description, $type, $required, $filter)
+        );
         return $this;
     }
 
     /**
-     * Add a usage to the command by name.
-     *
-     * @param list<string> $optionNames
-     *
-     * @throws ValueException
+     * @param array<int, string> $optionNames
      */
     public function addUsage(string $command, array $optionNames): self
     {
-        if ($this->optHandler->getOptionType($command) !== 'command') {
-            throw new ValueException('Usage argument not a command: ' . $command);
-        }
-
-        // Multiple usages besides help must define a command.
-        if (count($this->usages) > 2 && ! $this->allCommands) {
-            throw new ValueException('Must define command for each usage');
-        }
-
-        $this->usages[] = new Usage($this->optHandler, $optionNames, $command);
-
+        $this->usageDefinition->addUsage($command, $optionNames);
         return $this;
     }
 
     /**
-     * Add all options to a single usage except "help".
+     * Parse command line arguments.
+     *
+     * @param array<int, string>|null $argv If null, uses global $argv
+     * @throws OptParserException on parsing or validation errors
      */
-    public function addUsageAll(): self
+    public function parse(?array $argv = null): Input
     {
-        $optionNames = $this->optHandler->getAllNames();
+        $this->signalHandler?->register();
 
-        $hasCommand = false;
-        foreach ($optionNames as $optionName) {
-            if ($this->optHandler->getOptionType($optionName) === 'command') {
-                $hasCommand = true;
-                break;
+        if ($argv === null) {
+            global $_SERVER;
+            $argv = $_SERVER['argv'] ?? [];
+        }
+
+        // Remove script name
+        if (isset($argv[0]) && str_contains($argv[0], $this->programName)) {
+            array_shift($argv);
+        }
+
+        // Handle help/version flags
+        if ($this->isHelpRequest($argv)) {
+            $this->printHelp();
+            exit(0);
+        }
+
+        if ($this->isVersionRequest($argv)) {
+            $this->printVersion();
+            exit(0);
+        }
+
+        try {
+            $tokens = $this->tokenizer->tokenize($argv);
+            $syntaxParser = new SyntaxParser($this->optionRegistry);
+            $result = $syntaxParser->parse($tokens);
+
+            $validatedValues = $this->validateValues($result);
+            $command = $result->command;
+
+            if ($command !== null) {
+                $this->usageDefinition->validate($command, $validatedValues, $this->optionRegistry);
+            }
+
+            $nonOptions = $result->mappedOptions['_'] ?? [];
+
+            return new Input($command, $validatedValues, $nonOptions);
+        } catch (OptParserException $e) {
+            $this->outputHandler->stderr('error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    private function validateValues(\DouglasGreen\OptParser\Parser\ParsingResult $result): array
+    {
+        $validated = [];
+
+        foreach ($result->rawValues as $name => $value) {
+            $option = $this->optionRegistry->get($name);
+            $validated[$name] = $option->validateValue($value, $this->typeRegistry);
+        }
+
+        // Apply defaults for flags/params that weren't provided
+        foreach ($this->optionRegistry->getAll() as $option) {
+            if (!isset($validated[$option->getPrimaryName()])) {
+                $validated[$option->getPrimaryName()] = $option->getDefault();
             }
         }
 
-        if (! $hasCommand) {
-            $this->allCommands = false;
-        }
-
-        $filteredOptions = array_filter(
-            $optionNames,
-            static fn($option): bool => $option !== 'help',
-        );
-        $this->usages[] = new Usage($this->optHandler, $filteredOptions);
-
-        return $this;
+        return $validated;
     }
 
-    public function getArgParser(): ArgParser
+    private function isHelpRequest(array $argv): bool
     {
-        return $this->argParser;
-    }
-
-    public function getOptHandler(): OptHandler
-    {
-        return $this->optHandler;
-    }
-
-    /**
-     * @return list<Usage>
-     */
-    public function getUsages(): array
-    {
-        return $this->usages;
-    }
-
-    /**
-     * @param ?string[] $args
-     */
-    public function parse(?array $args = null): OptResult
-    {
-        global $argv;
-        if ($args === null) {
-            $args = $argv;
-        }
-
-        // If no usages have been added, add all by default.
-        if ($this->usages === []) {
-            $this->addUsageAll();
-        }
-
-        $this->argParser = new ArgParser($args);
-        $unmarkedOptions = $this->argParser->getUnmarkedOptions();
-        $markedOptions = $this->argParser->getMarkedOptions();
-        $nonOptions = $this->argParser->getNonOptions();
-
-        // Get options except for help.
-        $usages = $this->usages;
-        array_shift($usages);
-
-        // Check for help option and handle if found.
-        $helpOption = $this->optHandler->getOption('help');
-
-        foreach (array_keys($markedOptions) as $name) {
-            if ($helpOption->matchName($name)) {
-                $this->printHelp();
+        foreach ($argv as $arg) {
+            if ($arg === '--help' || $arg === '-h') {
+                return true;
             }
         }
+        return false;
+    }
 
-        $optResult = new OptResult($nonOptions);
-
-        // Report errors from arg parser.
-        $errors = $this->argParser->getErrors();
-        if ($errors !== []) {
-            foreach ($errors as $error) {
-                $optResult->addError($error);
-            }
-
-            $this->checkResult($optResult);
-        }
-
-        // The first unmarked input must be the command name.
-        $inputName = null;
-        if ($this->allCommands) {
-            $inputName = array_shift($unmarkedOptions);
-            if ($inputName === null) {
-                $optResult->addError('Command name not provided');
-                $this->checkResult($optResult);
-            } elseif (! $this->optHandler->isCommand($inputName)) {
-                $optResult->addError(sprintf('Command name not recognized: "%s"', $inputName));
-                $this->checkResult($optResult);
+    private function isVersionRequest(array $argv): bool
+    {
+        foreach ($argv as $arg) {
+            if ($arg === '--version') {
+                return true;
             }
         }
+        return false;
+    }
 
-        $matchFound = false;
-        foreach ($usages as $usage) {
-            // Match commands
-            if ($this->allCommands && $inputName !== null) {
-                $commandNames = $usage->getOptions('command');
+    private function printHelp(): void
+    {
+        $this->outputHandler->stdout("Usage: {$this->programName} [options] [command] [args]");
+        $this->outputHandler->stdout('');
+        $this->outputHandler->stdout($this->description);
+        $this->outputHandler->stdout('');
 
-                // There is only one command per usage.
-                $commandName = $commandNames[0];
-                $command = $this->optHandler->getOption($commandName);
+        $commands = $this->optionRegistry->getCommands();
+        if ($commands !== []) {
+            $this->outputHandler->stdout('Commands:');
+            foreach ($commands as $cmd) {
+                $names = implode(', ', $cmd->getNames());
+                $this->outputHandler->stdout("  {$names}\t{$cmd->getDescription()}");
+            }
+            $this->outputHandler->stdout('');
+        }
 
-                if ($command->matchName($inputName)) {
-                    $optResult->setCommand($commandName, true);
-                } else {
+        $options = $this->optionRegistry->getAll();
+        if ($options !== []) {
+            $this->outputHandler->stdout('Options:');
+            foreach ($options as $opt) {
+                if ($opt instanceof Command) {
                     continue;
                 }
-            }
+                $names = implode(', ', array_map(function ($n) use ($opt) {
+                    return strlen($n) === 1 ? "-{$n}" : "--{$n}";
+                }, $opt->getNames()));
 
-            // Match terms
-            $termNames = $usage->getOptions('term');
-            foreach ($termNames as $termName) {
-                $inputValue = array_shift($unmarkedOptions);
-                if ($inputValue === null) {
-                    $optResult->addError('Missing term: "' . $termName . '"');
-                    continue;
+                $type = '';
+                if ($opt instanceof Param) {
+                    $type = ' <value>';
                 }
 
-                $term = $this->optHandler->getOption($termName);
-                try {
-                    $matchedValue = $term->matchValue($inputValue);
-                    $optResult->setTerm($termName, $matchedValue);
-                } catch (ArgumentException $exception) {
-                    $optResult->addError(
-                        sprintf(
-                            'Term "%s" has invalid argument "%s": %s',
-                            $termName,
-                            $inputValue,
-                            $exception->getMessage(),
-                        ),
-                    );
-                }
+                $this->outputHandler->stdout("  {$names}{$type}\t{$opt->getDescription()}");
             }
-
-            // Command and terms are all that is required to match.
-            $matchFound = true;
-
-            // Warn about unused unmarked options
-            foreach ($unmarkedOptions as $optionName) {
-                $optResult->addError('Unused input: "' . $optionName . '"');
-            }
-
-            // Match flags
-            $flagNames = $usage->getOptions('flag');
-            foreach ($flagNames as $flagName) {
-                $flag = $this->optHandler->getOption($flagName);
-                $found = false;
-                $savedName = null;
-                $savedValue = null;
-                foreach ($markedOptions as $inputName => $inputValue) {
-                    if ($flag->matchName($inputName)) {
-                        $savedName = $inputName;
-                        $savedValue = $inputValue;
-                        $found = true;
-                        break;
-                    }
-                }
-
-                $optResult->setFlag($flagName, $found);
-
-                if ($found) {
-                    unset($markedOptions[$savedName]);
-                    if ($savedValue !== '') {
-                        $optResult->addError(
-                            sprintf('Argument passed to flag "%s": "%s"', $flagName, $savedValue),
-                        );
-                    }
-                }
-            }
-
-            // Match params
-            $paramNames = $usage->getOptions('param');
-            foreach ($paramNames as $paramName) {
-                $param = $this->optHandler->getOption($paramName);
-                $found = false;
-                $savedName = null;
-                $savedValue = null;
-                foreach ($markedOptions as $inputName => $inputValue) {
-                    if ($param->matchName($inputName)) {
-                        $savedName = $inputName;
-                        $savedValue = $inputValue;
-                        $found = true;
-                        break;
-                    }
-                }
-
-                if ($found) {
-                    unset($markedOptions[$savedName]);
-                    if ($savedValue === null) {
-                        $optResult->addError('No value passed to param "' . $paramName . '"');
-                    } else {
-                        try {
-                            $matchedValue = $param->matchValue($savedValue);
-                            $optResult->setParam($paramName, $matchedValue);
-                        } catch (ArgumentException $exception) {
-                            $optResult->addError(
-                                sprintf(
-                                    'Param "%s" has invalid argument "%s": %s',
-                                    $paramName,
-                                    $savedValue,
-                                    $exception->getMessage(),
-                                ),
-                            );
-                        }
-                    }
-                }
-            }
-
-            // Warn about unused marked options
-            foreach ($markedOptions as $optionName => $optionValue) {
-                $optResult->addError(
-                    sprintf('Unused input for "%s": "%s"', $optionName, $optionValue),
-                );
-            }
+            $this->outputHandler->stdout('');
         }
 
-        if (! $matchFound) {
-            $optResult->addError('Matching usage not found');
-        }
-
-        $this->checkResult($optResult);
-
-        return $optResult;
+        $this->outputHandler->stdout('Options:');
+        $this->outputHandler->stdout('  -h, --help     Display this help message');
+        $this->outputHandler->stdout('  --version      Display version information');
     }
 
-    /**
-     * Check for errors then write them and exit.
-     */
-    protected function checkResult(OptResult $optResult): void
+    private function printVersion(): void
     {
-        if ($this->hasFlag(self::SKIP_RESULT_CHECK)) {
-            return;
-        }
-
-        $errors = $optResult->getErrors();
-        if ($errors === []) {
-            return;
-        }
-
-        $message = 'Errors found in matching usage';
-        $command = $optResult->getCommand();
-        if ($command !== null) {
-            $message .= ' for command "' . $command . '"';
-        }
-
-        $message .= ':' . PHP_EOL;
-        foreach ($errors as $error) {
-            $message .= sprintf('* %s%s', $error, PHP_EOL);
-        }
-
-        $message .= PHP_EOL;
-        $message .= 'Program terminating. Run again with --help for help.';
-        error_log($message);
-        if (! $this->hasFlag(self::DEBUG_MODE)) {
-            exit();
-        }
+        $this->outputHandler->stdout("{$this->programName} {$this->version}");
     }
 
-    protected function hasFlag(int $flag): bool
+    public function getVersion(): string
     {
-        return (bool) ($this->flags & $flag);
-    }
-
-    /**
-     * Print the program help, including:
-     * - name
-     * - description
-     * - usage
-     * - options
-     */
-    protected function printHelp(): void
-    {
-        echo $this->name . PHP_EOL . PHP_EOL;
-        echo wordwrap($this->desc) . PHP_EOL . PHP_EOL;
-        echo 'Usage:' . PHP_EOL;
-        $programName = $this->argParser->getProgramName();
-        foreach ($this->usages as $usage) {
-            echo $usage->write($programName);
-        }
-
-        echo PHP_EOL;
-
-        echo $this->optHandler->writeOptionBlock();
-        if (! $this->hasFlag(self::DEBUG_MODE)) {
-            exit();
-        }
+        return $this->version;
     }
 }

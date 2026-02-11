@@ -1,228 +1,302 @@
-# opt-parser
+# OptParser
 
-Command-line option parser for PHP
+A POSIX.1-2017 compliant command-line option parser for PHP with GNU extensions.
 
-## Setup
+## Overview
 
-Add the project with Composer.
+OptParser implements the [IEEE Std 1003.1-2017 (POSIX.1-2017)](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html) utility conventions, supporting:
 
-```
-composer require douglasgreen/utility
-```
+- **Standard option syntax**: Short options (`-a`), clustering (`-abc`), and arguments (`-a value` or `-a=value`)
+- **GNU extensions**: Long options (`--option`, `--option=value`) for enhanced readability
+- **Strict separation**: stdout for data, stderr for diagnostics
+- **Standard exit codes**: `0` (success), `2` (usage error), `130` (SIGINT), etc.
+- **Type safety**: Built-in validation for 20+ data types (paths, dates, networks, etc.)
 
-## About
+Unlike PHP's built-in `getopt()`, OptParser supports positional arguments (terms), subcommands, automatic help generation, and strict validation with descriptive error messages.
 
-OptParser is a replacement for using the built-in
-[`getopt()`](https://www.php.net/manual/en/function.getopt.php) to get command-line options in PHP
-programs. It's better than getopt because:
+## Installation
 
--   It supports defining multiple option types and aliases.
--   It allows mixing positional and named options.
--   It allows defining separate commands, each with its own usage.
--   It automatically prints formatted program help.
--   It checks for unrecognized arguments to prevent invalid program execution.
-
-## Commands
-
-A program accepts one or more types of usage. A usage is a series of options.
-
-## Options
-
-An option is one of the following:
-
--   A command, which is the name of a requested operation.
--   A term, which is a positional argument.
--   A parameter, which is a hyphen-prefixed name with one required argument.
--   A flag, which is a hyphen-prefixed name with zero arguments.
-
-If there is a command, there can only be one command per usage and it must come first. If there are
-more than one usage, each usage must have a command to distinguish it.
-
-If there are terms, they are required and must follow the command, if any.
-
-Parameters and flags come last. The order is important to avoid ambiguity.
-
-Commands and terms are required, because they are positional, but parameters and flags are optional,
-because they are named.
-
-## Naming convention
-
-Long names for commands, flags, and parameters must all follow the Unix convention for their names:
-
--   All lowercase
--   Start with a letter
--   Contain letters, digits, and hyphens but no underscores
--   End in a letter or digit
-
-That is also known as kebab case. An example name is `file-path`.
-
-## Command matching
-
-Each usage is distinguished by its command. Each command is different and so only one usage can
-possibly match at runtime.
-
-## Argument aliases
-
-Each argument can have one or more aliases. If an alias is short (only one character), it is invoked
-with a single hyphen like `-h`. If an alias is long (more than one character), it is invoked with
-two hyphens like `--help`.
-
-Short aliases can be lower case or upper case.
-
-Each alias must be defined only once.
-
-## Argument names
-
-Every argument must have at least one long alias. The first long alias that is specified for that
-argument is used as the argument name. You must retrieve the argument using its name.
-
-Commands, parameters, and flags can have aliases. But a term is not marked so it only has a name,
-not aliases.
-
-## Argument types
-
-Most of the list of permitted argument types was taken from the list of
-[PHP validation filters](https://www.php.net/manual/en/filter.filters.validate.php). Some custom
-types were added. Permitted types include:
-
--   `BOOL` - Valid Boolean value (true for "1", "true", "on", and "yes")
--   `DATE` - Valid date value
--   `DATETIME` - Valid date and time value
--   `DIR` - Readable directory path
--   `DOMAIN` - Valid domain name length and value
--   `EMAIL` - Valid email address
--   `FIXED` - Valid fixed-point value
--   `FLOAT` - Valid floating-point value, allowing commas and scientific
--   `INFILE` - Readable file path
--   `INTERVAL` - Valid DateInterval string description
--   `INT` - Valid integer value, allowing octal and hex notations
--   `IP_ADDR` - Valid IP address
--   `MAC_ADDR` - Valid MAC address
--   `OUTFILE` - File path with writable parent dir, may or may not exist
--   `STRING` - Any string
--   `TIME` - Valid time value
--   `URL` - Valid URL
--   `UUID` - Valid Universal Unique ID, with or without hyphens
-
-These are specified as the second argument of `OptParser::addParam()` and `OptParser::addTerm()`,
-because parameters and terms accept arguments and therefore have type. These types are printed in
-program help and applied automatically during argument processing, resulting in program error and
-termination on failure to validate.
-
-## Argument filters
-
-You can define your own filter callback as the last argument of `OptParser::addParam()` and
-`OptParser::addTerm()` also. The filter can do custom validation. If validation succeeds, you can
-return the original value or a filtered version of it. If validation fails, throw a
-`BadArgumentException` with a descriptive error message, and the program will error and terminate.
-
-## Formatting
-
-Flags can't be combined, for example `-a -b -c` can't be written as `-abc`. That is to prevent
-errors where you type one hyphen like -pass instead of --pass and get options -a -p and -s by
-mistake.
-
-A space or equal sign must separate every flag or parameter from its argument.
-
-The argument list can be terminated by `--`, which can be followed by non-options. The program
-ignores non-options but returns them with the matched usage. You can retrieve them using
-`OptResult::getNonoptions()`.
-
-## Fetching results
-
-Results are returned by `OptParser::parse()` as an `OptResult` object which I call `$input` as it
-represents user input.
-
-You can retrieve matched arguments from the user with `$input->get($name)`, where name was the
-option name. You can also retrieve arguments with as attributes with `$input->$name`. Camel case in
-the attribute names is mapped to kebab case in option names. For example, `$input->filePath` would
-map to the `file-path` option name.
-
-## Program interface
-
-To use OptParser:
-
-1. Create an `OptParser` instance with the name and description of the program. This is used when
-   displaying program help.
-2. Use chained calls on `$optParser` to `addCommand()`, `addTerm()`, `addParam()`, and `addFlag()`
-   to define those types of options.
-3. Combine the options together into usages by calling `$optParser->addUsage()` to add a specific
-   combination of option names. If there is only one usage, you can call the simpler
-   `$optParser->addUsageAll()` to add all the options at once.
-4. Parse the arguments with `$input = $optParser->parse();`.
-5. Get the command executed with `$command = $input->getCommand();` to determine how to interpret
-   output.
-6. Fetch each option name for the current command with `$input->get($name)` or the more concise
-   `$input->$name`.
-
-## Sample usage
-
-There is a [sample usage](bin/sample_usage.php) in a file. You can also run the program with `-h` to see
-sample help output.
-
-## Sample help
-
-The sample help output looks like this:
-
-```
-User Manager
-
-A program to manage user accounts
-
-Usage:
-  sample_usage.php --help
-  sample_usage.php add username:STRING email:STRING --password=STRING --role=STRING
-  sample_usage.php delete username:STRING
-  sample_usage.php list --output=OUTFILE --verbose
-
-Commands:
-  add | a  Add a new user
-  delete | d  Delete an existing user
-  list | l  List all users
-
-Terms:
-  username: STRING  Username of the user
-  email: STRING  Email of the user
-
-Parameters:
-  --password | -p = STRING  Password for the user
-  --role | -r = STRING  Role of the user
-  --output | -o = OUTFILE  Output file for the list command
-
-Flags:
-  --help | -h  Display program help
-  --verbose | -v  Enable verbose output
-  --quiet | -q  Suppress output
+```bash
+composer require douglasgreen/opt-parser
 ```
 
-This shows:
+## POSIX Compliance
 
--   Program name
--   Proram description
--   List of usages, including the always-available `--help`. Each usage is presented in order:
-    command, terms, paramaters, and flags.
--   Term types are marked with a colon and paramater types are marked with an equals sign which may
-    be used in passing the argument. Type names are in all caps.
--   Each section shows its aliases alternating by pipes with the primary name first, followed by a
-    description.
+This library adheres to POSIX.1-2017 Section 12.2 (Utility Syntax Guidelines) and XCU Section 12.2 (Utility Conventions):
 
-## Frequently Asked Questions
+### Option Syntax
 
-### Why use OptParser instead of getopt()?
+| Syntax | Description | Example |
+|--------|-------------|---------|
+| `-a` | Short option | `-v` (verbose) |
+| `-abc` | Clustered options (equivalent to `-a -b -c`) | `-vrf` (verbose, recursive, force) |
+| `-a value` | Option with argument (space-separated) | `-o output.txt` |
+| `-a=value` | Option with argument (equals-separated) | `-o=output.txt` |
+| `--long` | Long option (GNU extension) | `--verbose` |
+| `--long=value` | Long option with argument | `--output=file.txt` |
+| `--` | Option terminator (remaining args are operands) | `-- -filename-starting-with-dash` |
 
-OptParser supports positional arguments, does error checking, and prints a well-formatted help
-message. `getopt()` doesn't do these things.
+**Important**: When using clustered options, if the last option in a cluster requires an argument, the remaining characters are interpreted as the argument. For example, if `-o` requires an argument, `-abcovalue` is equivalent to `-a -b -c -o value`.
 
-### What option type should I use?
+### Exit Codes
 
-Commands are just there to distinguish between usages. If you have two or three arguments of
-different type that you won't confuse, then you can make them terms. But mostly you should give
-options names like parameters, which take an argument, and flags, which don't. Named options are
-harder to confuse.
+OptParser uses standard exit codes per `sysexits.h` and POSIX conventions:
 
-### What's the difference between addUsage() and addUsageAll()?
+| Code | Meaning | Usage |
+|------|---------|-------|
+| `0` | `EXIT_SUCCESS` | Successful execution |
+| `1` | `EXIT_FAILURE` | General error (catchall) |
+| `2` | `EX_USAGE` | CLI usage error (invalid arguments, unknown options) |
+| `126` | - | Command invoked cannot execute (permission denied) |
+| `127` | - | Command not found |
+| `130` | - | Fatal error signal (`128 + SIGINT(2)`) |
 
-`OptParser::addUsageAll()` is for the simple case when you only have one usage. Call this function
-to add all terms, parameters, and flags without having to repeat their names.
-`OptParser::addUsage()` is for the case when you have multiple commands. Call this function to add
-each command with its associated terms, parameters, and flags by name.
+### Stream Handling
+
+- **stdout**: Primary data output (results, matched options, machine-readable formats)
+- **stderr**: Diagnostic messages (errors, warnings, progress, help text when explicitly requested via error)
+
+### Signal Handling
+
+Long-running operations should handle `SIGINT` (Ctrl+C) gracefully, performing cleanup and exiting with status `130`.
+
+## Usage Guide
+
+### Basic Program Structure
+
+```php
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+use DouglasGreen\OptParser\OptParser;
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Define program with name and description
+$optParser = new OptParser('User Manager', 'Manage system user accounts');
+
+// Define options
+$optParser
+    // Commands (mutually exclusive operations)
+    ->addCommand(['add', 'a'], 'Add a new user')
+    ->addCommand(['delete', 'd'], 'Delete an existing user')
+    ->addCommand(['list', 'l'], 'List all users')
+    
+    // Terms (positional arguments)
+    ->addTerm('username', 'STRING', 'Username of the user')
+    ->addTerm('email', 'EMAIL', 'Email address of the user')
+    
+    // Parameters (named arguments with values)
+    ->addParam(['password', 'p'], 'STRING', 'Password for the user')
+    ->addParam(['role', 'r'], 'STRING', 'Role of the user')
+    ->addParam(['output', 'o'], 'OUTFILE', 'Output file path')
+    
+    // Flags (boolean switches)
+    ->addFlag(['verbose', 'v'], 'Enable verbose output')
+    ->addFlag(['quiet', 'q'], 'Suppress non-error output')
+    ->addFlag(['force', 'f'], 'Force operation without confirmation');
+
+// Define usage patterns (which options go with which commands)
+$optParser
+    ->addUsage('add', ['username', 'email', 'password', 'role', 'verbose', 'quiet'])
+    ->addUsage('delete', ['username', 'force', 'verbose'])
+    ->addUsage('list', ['output', 'verbose']);
+
+// Parse arguments (uses $argv by default)
+try {
+    $input = $optParser->parse();
+} catch (Exception $e) {
+    // Fatal parsing errors exit with code 2 (EX_USAGE)
+    // Use --help for usage information
+    exit(2);
+}
+
+// Execute based on matched command
+$command = $input->getCommand();
+
+switch ($command) {
+    case 'add':
+        $username = $input->get('username');
+        $email = $input->get('email');
+        $password = $input->get('password');
+        $role = $input->get('role') ?? 'user';
+        $verbose = $input->get('verbose') ?? false;
+        
+        // Implementation...
+        break;
+        
+    case 'delete':
+        $username = $input->get('username');
+        $force = $input->get('force') ?? false;
+        // Implementation...
+        break;
+        
+    case 'list':
+        $output = $input->get('output');
+        $verbose = $input->get('verbose') ?? false;
+        // Implementation...
+        break;
+}
+```
+
+### Option Types
+
+The parser supports four option categories:
+
+| Type | Description | POSIX Equivalent | Example |
+|------|-------------|------------------|---------|
+| **Command** | Subcommand selector (first positional) | Utility operand | `git clone` |
+| **Term** | Positional argument with validation | Utility operand | `file.txt` |
+| **Param** | Option requiring an argument | Option with operand | `-o file` or `--output=file` |
+| **Flag** | Boolean option without argument | Option without operand | `-v` or `--verbose` |
+
+### POSIX Option Syntax Details
+
+**Short Options:**
+- Single hyphen followed by single character: `-a`
+- May be clustered: `-abc` equivalent to `-a -b -c`
+- Argument may follow immediately or be separated by space: `-ovalue` or `-o value`
+- If clustering options where the last takes an argument: `-abco value` or `-abcovalue`
+
+**Long Options:**
+- Double hyphen followed by name: `--verbose`
+- Arguments may be separated by space or equals: `--output file` or `--output=file`
+- Names use kebab-case (lowercase with hyphens)
+
+**Option Terminator:**
+- Double hyphen `--` indicates end of options
+- All subsequent arguments are treated as operands (terms), even if they start with `-`
+
+### Data Types
+
+Built-in validation types (extending POSIX with type safety):
+
+| Type | Validation | Example |
+|------|------------|---------|
+| `STRING` | Any string | `"hello"` |
+| `INT` | Integer (octal/hex supported) | `42`, `0x2A` |
+| `FLOAT` | Floating point | `3.14`, `1e10` |
+| `BOOL` | Boolean | `true`, `1`, `yes` |
+| `DATE` | ISO 8601 date | `2024-01-15` |
+| `DATETIME` | ISO 8601 datetime | `2024-01-15 14:30:00` |
+| `TIME` | Time string | `14:30:00` |
+| `INTERVAL` | Date interval | `1 day 2 hours` |
+| `EMAIL` | Email address | `user@example.com` |
+| `URL` | URL | `https://example.com` |
+| `DOMAIN` | Domain name | `example.com` |
+| `IP_ADDR` | IP address | `192.168.1.1` |
+| `MAC_ADDR` | MAC address | `00:1B:44:11:3A:B7` |
+| `UUID` | UUID | `550e8400-e29b-41d4-a716-446655440000` |
+| `INFILE` | Readable file path | `/path/to/input` |
+| `OUTFILE` | Writable file path | `/path/to/output` |
+| `DIR` | Readable directory | `/path/to/dir` |
+| `FIXED` | Fixed-point number | `1,234.56` |
+
+### Exit Codes
+
+The library uses standard exit codes per `sysexits.h` and POSIX conventions:
+
+| Code | Constant | Meaning |
+|------|----------|---------|
+| `0` | `EXIT_SUCCESS` | Successful execution |
+| `1` | `EXIT_FAILURE` | General error during execution |
+| `2` | `EX_USAGE` | Command line usage error (invalid arguments, unknown options, missing required options) |
+| `126` | - | Command invoked cannot execute (permission denied) |
+| `127` | - | Command not found |
+| `128` | - | Invalid exit argument |
+| `130` | - | Script terminated by Ctrl+C (SIGINT) |
+
+### Error Handling
+
+Errors are written to **stderr** with descriptive messages. The parser distinguishes between:
+
+- **Usage errors** (exit code 2): Invalid syntax, unknown options, missing arguments
+- **Validation errors** (exit code 1): Type mismatches, file not found, invalid formats
+- **Logic errors**: Exceptions thrown during callback execution
+
+Example error output:
+```
+error: unrecognized option '--verbos'
+error: option '--output' requires an argument
+error: term 'username' has invalid argument '123': Not a valid string
+```
+
+### Advanced Features
+
+#### Custom Validation Filters
+
+Apply custom logic to any parameter or term:
+
+```php
+$optParser->addParam(
+    ['role', 'r'],
+    'STRING',
+    'User role',
+    function ($value) {
+        $allowed = ['admin', 'editor', 'viewer'];
+        if (!in_array($value, $allowed, true)) {
+            throw new Exception(
+                "Role must be one of: " . implode(', ', $allowed)
+            );
+        }
+        return $value;
+    }
+);
+```
+
+#### Signal Handling
+
+For long-running operations, handle interruption gracefully:
+
+```php
+declare(ticks=1);
+
+pcntl_signal(SIGINT, function () {
+    // Cleanup temporary files, database transactions, etc.
+    error_log("Operation interrupted by user");
+    exit(130); // 128 + SIGINT(2)
+});
+
+// Your main logic here
+```
+
+#### Non-Options (Operands)
+
+Arguments after `--` are treated as operands regardless of content:
+
+```bash
+# Delete a file literally named "--force"
+php delete.php -- --force
+```
+
+Access via:
+```php
+$nonOptions = $input->getNonoptions(); // ['--force']
+```
+
+### Best Practices
+
+1. **Options before operands**: While POSIX allows intermixing, place all options before positional arguments for clarity
+2. **Use long options in scripts**: `--verbose` is more readable than `-v` in automation
+3. **Check exit codes**: Always check `$?` in shell scripts; don't assume success
+4. **Quote operands**: Always quote variables that might contain spaces or special characters
+5. **Use `--`**: When passing arbitrary filenames, always use `--` to prevent option injection
+
+### Comparison with getopt()
+
+| Feature | PHP getopt() | OptParser |
+|---------|--------------|-------------|
+| Short options | Yes | Yes |
+| Long options | Limited | Yes (GNU style) |
+| Option clustering | No | Yes (`-abc`) |
+| Positional arguments | No | Yes (Terms) |
+| Subcommands | No | Yes (Commands) |
+| Type validation | No | Yes (20+ types) |
+| Automatic help | No | Yes |
+| Standard exit codes | No | Yes |
+| `--` terminator | Partial | Full |
+
+### License
+
+MIT License - See LICENSE file for details.

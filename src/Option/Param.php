@@ -4,29 +4,55 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser\Option;
 
-class Param extends Option
-{
-    /**
-     * @param list<string> $aliases
-     */
-    public function __construct(
-        string $name,
-        string $desc,
-        array $aliases,
-        string $argType,
-        ?callable $callback = null,
-    ) {
-        parent::__construct($name, $desc, $callback);
-        foreach ($aliases as $alias) {
-            $this->addAlias($alias);
-        }
+use DouglasGreen\OptParser\Exception\ValidationException;
+use DouglasGreen\OptParser\Type\TypeRegistry;
 
-        $this->setArgType($argType);
+/**
+ * Option requiring a value (e.g., -o file or --output=file).
+ */
+final readonly class Param extends AbstractOption
+{
+    public function __construct(
+        array $names,
+        string $description,
+        private readonly string $typeName,
+        private readonly bool $required = false,
+        private readonly mixed $default = null,
+        private readonly ?\Closure $filter = null,
+    ) {
+        parent::__construct($names, $description);
     }
 
-    #[\Override]
-    public function write(): string
+    public function acceptsValue(): bool
     {
-        return $this->hyphenate($this->name) . '=' . $this->argType;
+        return true;
+    }
+
+    public function isRequired(): bool
+    {
+        return $this->required;
+    }
+
+    public function getDefault(): mixed
+    {
+        return $this->default;
+    }
+
+    public function validateValue(string $value, TypeRegistry $registry): mixed
+    {
+        $type = $registry->get($this->typeName);
+        $typedValue = $type->validate($value);
+
+        if ($this->filter !== null) {
+            try {
+                $typedValue = ($this->filter)($typedValue);
+            } catch (\Exception $e) {
+                throw new ValidationException(
+                    "Filter rejected value for '{$this->getPrimaryName()}': {$e->getMessage()}"
+                );
+            }
+        }
+
+        return $typedValue;
     }
 }
