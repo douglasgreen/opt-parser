@@ -28,6 +28,6 @@ final readonly class BoolType implements TypeInterface
             return false;
         }
 
-        throw new ValidationException("Invalid boolean: {$value}");
+        throw new ValidationException('Invalid boolean: ' . $value);
     }
 }

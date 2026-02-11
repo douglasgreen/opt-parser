@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser;
 
+use DouglasGreen\OptParser\Exception\UsageException;
+
 /**
  * Defines valid option combinations for specific commands.
  */
@@ -33,7 +35,7 @@ final class UsageDefinition
      *
      * @throws Exception\UsageException if invalid combination
      */
-    public function validate(string $command, array $providedOptions, Option\OptionRegistry $registry): void
+    public function validate(string $command, array $providedOptions): void
     {
         if (!isset($this->usages[$command])) {
             return; // No usage defined, allow anything
@@ -41,14 +43,16 @@ final class UsageDefinition
 
         $allowed = $this->usages[$command];
 
-        foreach ($providedOptions as $name => $value) {
-            if ($name === '_' || $name === $command) {
+        foreach (array_keys($providedOptions) as $name) {
+            if ($name === '_') {
                 continue;
             }
-
+            if ($name === $command) {
+                continue;
+            }
             if (!in_array($name, $allowed, true)) {
-                throw new Exception\UsageException(
-                    "Option '{$name}' is not allowed with command '{$command}'",
+                throw new UsageException(
+                    sprintf("Option '%s' is not allowed with command '%s'", $name, $command),
                 );
             }
         }

@@ -20,8 +20,8 @@ final readonly class IntervalType implements TypeInterface
         try {
             new DateInterval($value);
             return $value;
-        } catch (Exception $e) {
-            throw new ValidationException("Invalid interval: {$value}");
+        } catch (Exception) {
+            throw new ValidationException('Invalid interval: ' . $value);
         }
     }
 }

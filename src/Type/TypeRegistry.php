@@ -30,7 +30,7 @@ final class TypeRegistry
     public function get(string $name): TypeInterface
     {
         if (!isset($this->types[$name])) {
-            throw new ValidationException("Unknown type: {$name}");
+            throw new ValidationException('Unknown type: ' . $name);
         }
 
         return $this->types[$name];

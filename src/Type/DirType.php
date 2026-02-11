@@ -16,7 +16,7 @@ final readonly class DirType implements TypeInterface
     public function validate(string $value): string
     {
         if (!is_dir($value) || !is_readable($value)) {
-            throw new ValidationException("Directory not found or not readable: {$value}");
+            throw new ValidationException('Directory not found or not readable: ' . $value);
         }
 
         return $value;

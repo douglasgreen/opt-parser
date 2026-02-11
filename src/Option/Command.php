@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser\Option;
 
+use DouglasGreen\OptParser\Type\TypeRegistry;
+
 /**
  * Subcommand selector (e.g., git clone, git push).
  */
@@ -14,7 +16,7 @@ final readonly class Command extends AbstractOption
         return false;
     }
 
-    public function validateValue(string $value, \DouglasGreen\OptParser\Type\TypeRegistry $registry): string
+    public function validateValue(string $value, TypeRegistry $registry): string
     {
         return $value;
     }

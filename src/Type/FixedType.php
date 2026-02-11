@@ -19,7 +19,7 @@ final readonly class FixedType implements TypeInterface
         $normalized = str_replace(',', '', $value);
 
         if (!is_numeric($normalized)) {
-            throw new ValidationException("Invalid fixed-point number: {$value}");
+            throw new ValidationException('Invalid fixed-point number: ' . $value);
         }
 
         return $value;

@@ -8,7 +8,6 @@ use DouglasGreen\OptParser\Exception\UsageException;
 use DouglasGreen\OptParser\Option\Command;
 use DouglasGreen\OptParser\Option\OptionInterface;
 use DouglasGreen\OptParser\Option\OptionRegistry;
-use DouglasGreen\OptParser\Option\Param;
 
 /**
  * POSIX.1-2017 compliant syntax parser.
@@ -31,7 +30,7 @@ final readonly class SyntaxParser
         $currentOption = null;
         $operandOnly = false;
 
-        foreach ($tokens as $i => $token) {
+        foreach ($tokens as $token) {
             if ($token->type === TokenType::TERMINATOR) {
                 $operandOnly = true;
                 continue;
@@ -54,8 +53,8 @@ final readonly class SyntaxParser
         }
 
         // Check if we were expecting a value that never came
-        if ($expectingValue && $currentOption !== null) {
-            throw new UsageException("Option '{$currentOption->getPrimaryName()}' requires a value");
+        if ($expectingValue && $currentOption instanceof OptionInterface) {
+            throw new UsageException(sprintf("Option '%s' requires a value", $currentOption->getPrimaryName()));
         }
 
         $this->processOperands($result);
@@ -69,14 +68,15 @@ final readonly class SyntaxParser
 
         try {
             $option = $this->optionRegistry->get($name);
-        } catch (UsageException $e) {
-            throw new UsageException("Unknown option '--{$name}'");
+        } catch (UsageException) {
+            throw new UsageException(sprintf("Unknown option '--%s'", $name));
         }
 
         if ($option instanceof Command) {
             if ($result->command !== null) {
                 throw new UsageException('Multiple commands specified');
             }
+
             $result->command = $name;
             return;
         }
@@ -86,7 +86,7 @@ final readonly class SyntaxParser
                 $result->mappedOptions[$option->getPrimaryName()] = $token->attachedValue;
                 $result->rawValues[$option->getPrimaryName()] = $token->attachedValue;
             } else {
-                throw new UsageException("Option '--{$name}' requires a value");
+                throw new UsageException(sprintf("Option '--%s' requires a value", $name));
             }
         } else {
             $result->mappedOptions[$option->getPrimaryName()] = true;
@@ -103,14 +103,15 @@ final readonly class SyntaxParser
 
         try {
             $option = $this->optionRegistry->get($name);
-        } catch (UsageException $e) {
-            throw new UsageException("Unknown option '-{$name}'");
+        } catch (UsageException) {
+            throw new UsageException(sprintf("Unknown option '-%s'", $name));
         }
 
         if ($option instanceof Command) {
             if ($result->command !== null) {
                 throw new UsageException('Multiple commands specified');
             }
+
             $result->command = $name;
             return;
         }
@@ -148,7 +149,7 @@ final readonly class SyntaxParser
         // Check required terms
         foreach ($terms as $i => $term) {
             if ($i >= $termIndex && $term->isRequired()) {
-                throw new UsageException("Missing required argument: {$term->getPrimaryName()}");
+                throw new UsageException('Missing required argument: ' . $term->getPrimaryName());
             }
         }
     }

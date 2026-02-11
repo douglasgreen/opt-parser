@@ -16,7 +16,7 @@ final readonly class EmailType implements TypeInterface
     public function validate(string $value): string
     {
         if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-            throw new ValidationException("Invalid email: {$value}");
+            throw new ValidationException('Invalid email: ' . $value);
         }
 
         return $value;

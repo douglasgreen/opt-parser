@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser\Option;
 
+use Override;
 use Closure;
 use DouglasGreen\OptParser\Exception\ValidationException;
 use DouglasGreen\OptParser\Type\TypeRegistry;
@@ -17,9 +18,9 @@ final readonly class Term extends AbstractOption
     public function __construct(
         string $name,
         string $description,
-        private readonly string $typeName,
-        private readonly bool $required = true,
-        private readonly ?Closure $filter = null,
+        private string $typeName,
+        private bool $required = true,
+        private ?Closure $filter = null,
     ) {
         parent::__construct([$name], $description);
     }
@@ -29,6 +30,7 @@ final readonly class Term extends AbstractOption
         return true;
     }
 
+    #[Override]
     public function isRequired(): bool
     {
         return $this->required;
@@ -39,12 +41,12 @@ final readonly class Term extends AbstractOption
         $type = $registry->get($this->typeName);
         $typedValue = $type->validate($value);
 
-        if ($this->filter !== null) {
+        if ($this->filter instanceof Closure) {
             try {
                 $typedValue = ($this->filter)($typedValue);
             } catch (Exception $e) {
                 throw new ValidationException(
-                    "Filter rejected value for '{$this->getPrimaryName()}': {$e->getMessage()}",
+                    sprintf("Filter rejected value for '%s': %s", $this->getPrimaryName(), $e->getMessage()),
                 );
             }
         }

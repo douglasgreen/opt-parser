@@ -16,7 +16,7 @@ final readonly class IntType implements TypeInterface
     public function validate(string $value): int
     {
         if (!filter_var($value, FILTER_VALIDATE_INT)) {
-            throw new ValidationException("Invalid integer: {$value}");
+            throw new ValidationException('Invalid integer: ' . $value);
         }
 
         return (int) $value;

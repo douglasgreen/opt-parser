@@ -7,7 +7,7 @@ namespace DouglasGreen\OptParser\Util;
 /**
  * Handles POSIX signals for graceful shutdown.
  */
-final class SignalHandler
+final readonly class SignalHandler
 {
     public function __construct(
         private OutputHandler $output,
@@ -19,7 +19,7 @@ final class SignalHandler
             return;
         }
 
-        pcntl_signal(SIGINT, function () {
+        pcntl_signal(SIGINT, function (): never {
             $this->output->stderr('');
             $this->output->stderr('Operation interrupted');
             exit(130); // 128 + SIGINT(2)

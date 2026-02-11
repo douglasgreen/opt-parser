@@ -16,7 +16,7 @@ final readonly class IpAddrType implements TypeInterface
     public function validate(string $value): string
     {
         if (!filter_var($value, FILTER_VALIDATE_IP)) {
-            throw new ValidationException("Invalid IP address: {$value}");
+            throw new ValidationException('Invalid IP address: ' . $value);
         }
 
         return $value;

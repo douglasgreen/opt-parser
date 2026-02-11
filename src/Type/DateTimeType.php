@@ -16,7 +16,7 @@ final readonly class DateTimeType implements TypeInterface
     public function validate(string $value): string
     {
         if (strtotime($value) === false) {
-            throw new ValidationException("Invalid datetime: {$value}");
+            throw new ValidationException('Invalid datetime: ' . $value);
         }
 
         return $value;

@@ -88,6 +88,7 @@ final class Tokenizer
             for ($j = 0; $j < $len - 1; $j++) {
                 $tokens[] = new Token(TokenType::SHORT_OPTION, $chars[$j]);
             }
+
             $tokens[] = new Token(TokenType::SHORT_OPTION, $chars[$len - 1]);
         }
     }

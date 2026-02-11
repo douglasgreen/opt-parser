@@ -17,7 +17,7 @@ final readonly class MacAddrType implements TypeInterface
     {
         $pattern = '/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/';
         if (!preg_match($pattern, $value)) {
-            throw new ValidationException("Invalid MAC address: {$value}");
+            throw new ValidationException('Invalid MAC address: ' . $value);
         }
 
         return $value;

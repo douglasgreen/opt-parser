@@ -16,7 +16,7 @@ final readonly class FloatType implements TypeInterface
     public function validate(string $value): float
     {
         if (!filter_var($value, FILTER_VALIDATE_FLOAT)) {
-            throw new ValidationException("Invalid float: {$value}");
+            throw new ValidationException('Invalid float: ' . $value);
         }
 
         return (float) $value;

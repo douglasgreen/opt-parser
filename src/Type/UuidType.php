@@ -17,7 +17,7 @@ final readonly class UuidType implements TypeInterface
     {
         $pattern = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i';
         if (!preg_match($pattern, $value)) {
-            throw new ValidationException("Invalid UUID: {$value}");
+            throw new ValidationException('Invalid UUID: ' . $value);
         }
 
         return $value;

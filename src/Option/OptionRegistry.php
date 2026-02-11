@@ -38,7 +38,7 @@ final class OptionRegistry
             $key = $this->normalizeName($name);
 
             if (isset($this->options[$key])) {
-                throw new InvalidArgumentException("Option name conflict: {$name}");
+                throw new InvalidArgumentException('Option name conflict: ' . $name);
             }
 
             $this->options[$key] = $option;
@@ -67,7 +67,7 @@ final class OptionRegistry
         $key = $this->normalizeName($name);
 
         if (!isset($this->options[$key])) {
-            throw new UsageException("Unknown option: {$name}");
+            throw new UsageException('Unknown option: ' . $name);
         }
 
         return $this->options[$key];

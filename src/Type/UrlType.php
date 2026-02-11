@@ -16,7 +16,7 @@ final readonly class UrlType implements TypeInterface
     public function validate(string $value): string
     {
         if (!filter_var($value, FILTER_VALIDATE_URL)) {
-            throw new ValidationException("Invalid URL: {$value}");
+            throw new ValidationException('Invalid URL: ' . $value);
         }
 
         return $value;

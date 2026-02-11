@@ -13,11 +13,11 @@ final class OutputHandler
 {
     private bool $isTty;
 
-    private bool $noColor;
+    private readonly bool $noColor;
 
     public function __construct(
-        private ?LoggerInterface $logger = null,
-        private bool $forceColor = false,
+        private readonly ?LoggerInterface $logger = null,
+        private readonly bool $forceColor = false,
     ) {
         $this->noColor = $this->detectNoColor();
     }
@@ -31,7 +31,7 @@ final class OutputHandler
     {
         fwrite(STDERR, $message . PHP_EOL);
 
-        if ($this->logger !== null) {
+        if ($this->logger instanceof LoggerInterface) {
             $this->logger->error($message);
         }
     }
@@ -56,10 +56,6 @@ final class OutputHandler
 
     private function detectNoColor(): bool
     {
-        if (getenv('NO_COLOR') !== false) {
-            return true;
-        }
-
-        return false;
+        return getenv('NO_COLOR') !== false;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser;
 
+use DouglasGreen\OptParser\Parser\ParsingResult;
 use Closure;
 use DouglasGreen\OptParser\Exception\OptParserException;
 use DouglasGreen\OptParser\Option\Command;
@@ -20,7 +21,7 @@ use DouglasGreen\OptParser\Util\SignalHandler;
 /**
  * Main API for POSIX-compliant command-line parsing.
  */
-final class OptParser
+final readonly class OptParser
 {
     private OptionRegistry $optionRegistry;
 
@@ -35,9 +36,9 @@ final class OptParser
     private OutputHandler $outputHandler;
 
     public function __construct(
-        private readonly string $programName,
-        private readonly string $description,
-        private readonly string $version = '1.0.0',
+        private string $programName,
+        private string $description,
+        private string $version = '1.0.0',
     ) {
         $this->optionRegistry = new OptionRegistry();
         $this->typeRegistry = new TypeRegistry();
@@ -151,9 +152,9 @@ final class OptParser
             $nonOptions = $result->mappedOptions['_'] ?? [];
 
             return new Input($command, $validatedValues, $nonOptions);
-        } catch (OptParserException $e) {
-            $this->outputHandler->stderr('error: ' . $e->getMessage());
-            throw $e;
+        } catch (OptParserException $optParserException) {
+            $this->outputHandler->stderr('error: ' . $optParserException->getMessage());
+            throw $optParserException;
         }
     }
 
@@ -162,7 +163,7 @@ final class OptParser
         return $this->version;
     }
 
-    private function validateValues(\DouglasGreen\OptParser\Parser\ParsingResult $result): array
+    private function validateValues(ParsingResult $result): array
     {
         $validated = [];
 
@@ -188,22 +189,18 @@ final class OptParser
                 return true;
             }
         }
+
         return false;
     }
 
     private function isVersionRequest(array $argv): bool
     {
-        foreach ($argv as $arg) {
-            if ($arg === '--version') {
-                return true;
-            }
-        }
-        return false;
+        return in_array('--version', $argv, true);
     }
 
     private function printHelp(): void
     {
-        $this->outputHandler->stdout("Usage: {$this->programName} [options] [command] [args]");
+        $this->outputHandler->stdout(sprintf('Usage: %s [options] [command] [args]', $this->programName));
         $this->outputHandler->stdout('');
         $this->outputHandler->stdout($this->description);
         $this->outputHandler->stdout('');
@@ -213,8 +210,9 @@ final class OptParser
             $this->outputHandler->stdout('Commands:');
             foreach ($commands as $cmd) {
                 $names = implode(', ', $cmd->getNames());
-                $this->outputHandler->stdout("  {$names}\t{$cmd->getDescription()}");
+                $this->outputHandler->stdout(sprintf('  %s	%s', $names, $cmd->getDescription()));
             }
+
             $this->outputHandler->stdout('');
         }
 
@@ -225,17 +223,17 @@ final class OptParser
                 if ($opt instanceof Command) {
                     continue;
                 }
-                $names = implode(', ', array_map(function ($n) use ($opt) {
-                    return strlen($n) === 1 ? "-{$n}" : "--{$n}";
-                }, $opt->getNames()));
+
+                $names = implode(', ', array_map(fn(string $n) => strlen($n) === 1 ? '-' . $n : '--' . $n, $opt->getNames()));
 
                 $type = '';
                 if ($opt instanceof Param) {
                     $type = ' <value>';
                 }
 
-                $this->outputHandler->stdout("  {$names}{$type}\t{$opt->getDescription()}");
+                $this->outputHandler->stdout(sprintf('  %s%s	%s', $names, $type, $opt->getDescription()));
             }
+
             $this->outputHandler->stdout('');
         }
 
@@ -246,6 +244,6 @@ final class OptParser
 
     private function printVersion(): void
     {
-        $this->outputHandler->stdout("{$this->programName} {$this->version}");
+        $this->outputHandler->stdout(sprintf('%s %s', $this->programName, $this->version));
     }
 }
