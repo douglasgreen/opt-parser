@@ -47,9 +47,11 @@ final class UsageDefinition
             if ($name === '_') {
                 continue;
             }
+
             if ($name === $command) {
                 continue;
             }
+
             if (!in_array($name, $allowed, true)) {
                 throw new UsageException(
                     sprintf("Option '%s' is not allowed with command '%s'", $name, $command),

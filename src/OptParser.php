@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser;
 
-use DouglasGreen\OptParser\Parser\ParsingResult;
 use Closure;
 use DouglasGreen\OptParser\Exception\OptParserException;
 use DouglasGreen\OptParser\Option\Command;
@@ -12,6 +11,7 @@ use DouglasGreen\OptParser\Option\Flag;
 use DouglasGreen\OptParser\Option\OptionRegistry;
 use DouglasGreen\OptParser\Option\Param;
 use DouglasGreen\OptParser\Option\Term;
+use DouglasGreen\OptParser\Parser\ParsingResult;
 use DouglasGreen\OptParser\Parser\SyntaxParser;
 use DouglasGreen\OptParser\Parser\Tokenizer;
 use DouglasGreen\OptParser\Type\TypeRegistry;
@@ -146,7 +146,7 @@ final readonly class OptParser
             $command = $result->command;
 
             if ($command !== null) {
-                $this->usageDefinition->validate($command, $validatedValues, $this->optionRegistry);
+                $this->usageDefinition->validate($command, $validatedValues);
             }
 
             $nonOptions = $result->mappedOptions['_'] ?? [];
@@ -224,7 +224,7 @@ final readonly class OptParser
                     continue;
                 }
 
-                $names = implode(', ', array_map(fn(string $n) => strlen($n) === 1 ? '-' . $n : '--' . $n, $opt->getNames()));
+                $names = implode(', ', array_map(fn (string $n): string => strlen($n) === 1 ? '-' . $n : '--' . $n, $opt->getNames()));
 
                 $type = '';
                 if ($opt instanceof Param) {

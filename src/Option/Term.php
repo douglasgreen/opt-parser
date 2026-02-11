@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser\Option;
 
-use Override;
 use Closure;
 use DouglasGreen\OptParser\Exception\ValidationException;
 use DouglasGreen\OptParser\Type\TypeRegistry;
 use Exception;
+use Override;
 
 /**
  * Positional argument (term).
