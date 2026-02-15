@@ -19,7 +19,9 @@ use DouglasGreen\OptParser\Type\TypeRegistry;
  * - Forcing operations: `--force`, `-f`
  *
  * @package OptParser\Option
+ *
  * @api
+ *
  * @since 1.0.0
  * @see AbstractOption For inherited base functionality
  *
@@ -56,6 +58,7 @@ final readonly class Flag extends AbstractOption
      *
      * @param string $value Ignored for flags
      * @param TypeRegistry $registry Ignored for flags
+     *
      * @return true Always returns true when flag is present
      */
     public function validateValue(string $value, TypeRegistry $registry): true

@@ -16,7 +16,9 @@ namespace DouglasGreen\OptParser\Util;
  * or restricted environments).
  *
  * @package DouglasGreen\OptParser\Util
+ *
  * @api
+ *
  * @since 1.0.0
  * @see OutputHandler For output handling during signal events
  *

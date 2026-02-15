@@ -12,7 +12,9 @@ namespace DouglasGreen\OptParser\Parser;
  * directly to the option (e.g., --opt=value or -ovalue).
  *
  * @package DouglasGreen\OptParser\Parser
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TokenType For the token type enumeration
  * @see Tokenizer For token creation from argv arrays

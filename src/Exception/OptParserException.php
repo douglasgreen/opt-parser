@@ -15,7 +15,9 @@ use Exception;
  * between validation errors, usage errors, and other failure modes.
  *
  * @package OptParser\Exception
+ *
  * @api
+ *
  * @since 1.0.0
  * @see ValidationException For type mismatch and format errors
  * @see UsageException For CLI syntax and unknown option errors

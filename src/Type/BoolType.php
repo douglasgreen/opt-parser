@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * used in command-line arguments and configuration files.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -60,7 +62,9 @@ final readonly class BoolType implements TypeInterface
      * - Falsy: 'false', '0', 'no', 'off', '' (empty string)
      *
      * @param string $value The string to validate and convert
+     *
      * @return bool The converted boolean value
+     *
      * @throws ValidationException When the value is not a recognized boolean representation
      */
     public function validate(string $value): bool

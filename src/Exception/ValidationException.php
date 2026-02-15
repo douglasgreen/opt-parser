@@ -15,7 +15,9 @@ use Throwable;
  * overridden to 1 for system-level validation failures.
  *
  * @package OptParser\Exception
+ *
  * @api
+ *
  * @since 1.0.0
  * @see OptParserException For the base exception contract
  */

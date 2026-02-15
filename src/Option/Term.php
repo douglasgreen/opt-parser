@@ -23,7 +23,9 @@ use Override;
  * - Typically appear after all named options
  *
  * @package OptParser\Option
+ *
  * @api
+ *
  * @since 1.0.0
  * @see AbstractOption For inherited base functionality
  * @see OptionRegistry::getTerms() For retrieving all registered terms
@@ -102,7 +104,9 @@ final readonly class Term extends AbstractOption
      *
      * @param string $value The raw string value from command line
      * @param TypeRegistry $registry Type validators for validation
+     *
      * @return mixed The validated and possibly transformed value
+     *
      * @throws ValidationException When type validation fails or filter throws
      */
     public function validateValue(string $value, TypeRegistry $registry): mixed

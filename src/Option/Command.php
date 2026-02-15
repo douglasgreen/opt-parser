@@ -17,7 +17,9 @@ use DouglasGreen\OptParser\Type\TypeRegistry;
  * may be active per invocation.
  *
  * @package OptParser\Option
+ *
  * @api
+ *
  * @since 1.0.0
  * @see AbstractOption For inherited base functionality
  * @see OptionRegistry::getCommands() For retrieving all registered commands
@@ -55,6 +57,7 @@ final readonly class Command extends AbstractOption
      *
      * @param string $value The command name from command line
      * @param TypeRegistry $registry Ignored for commands
+     *
      * @return string The command name as provided
      */
     public function validateValue(string $value, TypeRegistry $registry): string

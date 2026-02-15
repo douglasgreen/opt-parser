@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * representation to preserve formatting and precision.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -46,7 +48,9 @@ final readonly class FixedType implements TypeInterface
      * The original string is returned to preserve the exact representation.
      *
      * @param string $value The string to validate as a fixed-point number
+     *
      * @return string The validated value unchanged
+     *
      * @throws ValidationException When the value is not a valid fixed-point number
      */
     public function validate(string $value): string

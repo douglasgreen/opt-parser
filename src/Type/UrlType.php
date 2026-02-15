@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * syntax according to RFC 2396.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -49,7 +51,9 @@ final readonly class UrlType implements TypeInterface
      * Note that this validates syntax only, not URL accessibility.
      *
      * @param string $value The string to validate as a URL
+     *
      * @return string The validated URL unchanged
+     *
      * @throws ValidationException When the URL format is invalid
      */
     public function validate(string $value): string

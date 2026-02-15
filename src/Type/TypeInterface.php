@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * format compliance and may convert strings to native types (e.g., int, float, bool).
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  *
  * @example
@@ -57,7 +59,9 @@ interface TypeInterface
      * type varies by implementation (string, int, float, bool, etc.).
      *
      * @param string $value The string input to validate and transform
+     *
      * @return mixed The validated and possibly transformed value
+     *
      * @throws ValidationException When the input fails type validation
      */
     public function validate(string $value): mixed;

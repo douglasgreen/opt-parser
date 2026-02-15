@@ -16,7 +16,9 @@ use Exception;
  * notation) used for representing time periods.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  * @see https://www.php.net/manual/en/dateinterval.construct.php For valid format specifications
@@ -53,7 +55,9 @@ final readonly class IntervalType implements TypeInterface
      * optionally 'T' followed by time components (H, M, S).
      *
      * @param string $value The interval string to validate (e.g., 'P1D', 'PT30M')
+     *
      * @return string The validated interval string unchanged
+     *
      * @throws ValidationException When the interval format is invalid
      */
     public function validate(string $value): string

@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * signed integers in the platform's integer range.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -49,7 +51,9 @@ final readonly class IntType implements TypeInterface
      * Returns the converted integer value, not the original string.
      *
      * @param string $value The string to validate and convert
+     *
      * @return int The validated integer value
+     *
      * @throws ValidationException When the value is not a valid integer representation
      */
     public function validate(string $value): int

@@ -18,7 +18,9 @@ use DouglasGreen\OptParser\Option\OptionRegistry;
  * specification.
  *
  * @package DouglasGreen\OptParser\Parser
+ *
  * @api
+ *
  * @since 1.0.0
  * @see Tokenizer For token generation from raw argv arrays
  * @see ParsingResult For the output structure
@@ -55,7 +57,9 @@ final readonly class SyntaxParser
      * parameters that require values and validates against the option registry.
      *
      * @param list<Token> $tokens Tokens produced by the Tokenizer
+     *
      * @return ParsingResult Structured result containing mapped options and operands
+     *
      * @throws UsageException When syntax violations occur (unknown options, missing values, multiple commands)
      *
      * @example
@@ -142,6 +146,7 @@ final readonly class SyntaxParser
      * @param ParsingResult $result The parsing result to populate
      * @param bool $expectingValue Reference flag indicating if a value is expected
      * @param OptionInterface|null $currentOption Reference to the option awaiting a value
+     *
      * @throws UsageException When the option is unknown or other syntax errors occur
      */
     private function parseLongOption(Token $token, ParsingResult $result, bool &$expectingValue, ?OptionInterface &$currentOption): void
@@ -189,6 +194,7 @@ final readonly class SyntaxParser
      * @param ParsingResult $result The parsing result to populate
      * @param bool $expectingValue Reference flag indicating if a value is expected
      * @param OptionInterface|null $currentOption Reference to the option awaiting a value
+     *
      * @throws UsageException When the option is unknown or other syntax errors occur
      */
     private function parseShortOption(

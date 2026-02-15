@@ -21,7 +21,9 @@ use DouglasGreen\OptParser\Type\TypeRegistry;
  * - `Term`: Positional arguments
  *
  * @package OptParser\Option
+ *
  * @api
+ *
  * @since 1.0.0
  * @see AbstractOption For base implementation
  * @see Command For subcommand options
@@ -84,7 +86,9 @@ interface OptionInterface
      *
      * @param string $value The raw string value from command line
      * @param TypeRegistry $registry Type validators for validation
+     *
      * @return mixed The validated and possibly transformed value
+     *
      * @throws ValidationException When the value fails type validation
      */
     public function validateValue(string $value, TypeRegistry $registry): mixed;

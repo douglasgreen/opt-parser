@@ -8,7 +8,9 @@ namespace DouglasGreen\OptParser\Parser;
  * Intermediate parsing state before validation.
  *
  * @package OptParser
+ *
  * @since 1.0.0
+ *
  * @internal
  */
 final class ParsingResult

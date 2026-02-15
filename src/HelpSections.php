@@ -8,7 +8,9 @@ namespace DouglasGreen\OptParser;
  * Container for optional help section content.
  *
  * @package OptParser
+ *
  * @since 1.0.0
+ *
  * @internal
  */
 final class HelpSections

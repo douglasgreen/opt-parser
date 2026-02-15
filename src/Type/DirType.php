@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * processing can proceed.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -47,7 +49,9 @@ final readonly class DirType implements TypeInterface
      * and has read permissions for the current user.
      *
      * @param string $value The directory path to validate
+     *
      * @return string The validated directory path unchanged
+     *
      * @throws ValidationException When the directory does not exist or is not readable
      */
     public function validate(string $value): string

@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * proceed, such as configuration files, data files, or source files.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  * @see OutfileType For output file validation
@@ -50,7 +52,9 @@ final readonly class InfileType implements TypeInterface
      * Returns the path unchanged on success.
      *
      * @param string $value The file path to validate
+     *
      * @return string The validated file path unchanged
+     *
      * @throws ValidationException When the file does not exist, is not a file, or is not readable
      */
     public function validate(string $value): string

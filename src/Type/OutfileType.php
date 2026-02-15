@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * but must be creatable in the specified location.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  * @see InfileType For input file validation
@@ -49,7 +51,9 @@ final readonly class OutfileType implements TypeInterface
      * does not need to exist, only its containing directory.
      *
      * @param string $value The output file path to validate
+     *
      * @return string The validated file path unchanged
+     *
      * @throws ValidationException When the parent directory does not exist or is not writable
      */
     public function validate(string $value): string

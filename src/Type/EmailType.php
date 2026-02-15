@@ -13,7 +13,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * FILTER_VALIDATE_EMAIL, which follows RFC 822 syntax requirements.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -45,7 +47,9 @@ final readonly class EmailType implements TypeInterface
      * syntax. Note that this validates syntax only, not deliverability.
      *
      * @param string $value The string to validate as an email address
+     *
      * @return string The validated email address unchanged
+     *
      * @throws ValidationException When the email format is invalid
      */
     public function validate(string $value): string

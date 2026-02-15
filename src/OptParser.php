@@ -30,7 +30,9 @@ use DouglasGreen\OptParser\Util\SignalHandler;
  * Instantiate with program metadata, then chain option definitions before parsing:
  *
  * @package OptParser
+ *
  * @api
+ *
  * @since 1.0.0
  * @see Input For the parsed result container
  * @see UsageException For CLI syntax errors
@@ -134,6 +136,7 @@ final readonly class OptParser
      *
      * @param array{0: string, 1?: string} $names Command names (primary name required, alias optional)
      * @param string $description Human-readable description for help output
+     *
      * @return self Returns $this for method chaining
      *
      * @example
@@ -159,6 +162,7 @@ final readonly class OptParser
      * @param Closure(mixed): mixed|null $filter Optional transformation/filter closure
      * @param bool $required Whether the option must be provided (default: false)
      * @param mixed $default Default value if option not provided (default: null)
+     *
      * @return self Returns $this for method chaining
      *
      * @example
@@ -190,6 +194,7 @@ final readonly class OptParser
      *
      * @param array{0: string, 1?: string} $names Option names (short and/or long form)
      * @param string $description Human-readable description for help output
+     *
      * @return self Returns $this for method chaining
      *
      * @example
@@ -215,6 +220,7 @@ final readonly class OptParser
      * @param string $description Human-readable description for help output
      * @param bool $required Whether the argument must be provided (default: true)
      * @param Closure(mixed): mixed|null $filter Optional transformation/filter closure
+     *
      * @return self Returns $this for method chaining
      *
      * @example
@@ -245,6 +251,7 @@ final readonly class OptParser
      *
      * @param string $command The command name to configure
      * @param array<int, string> $optionNames List of valid option names for this command
+     *
      * @return self Returns $this for method chaining
      *
      * @example
@@ -266,6 +273,7 @@ final readonly class OptParser
      * providing users with common invocation patterns.
      *
      * @param string $line A single example command line (without shell prompt)
+     *
      * @return self Returns $this for method chaining
      *
      * @example
@@ -288,6 +296,7 @@ final readonly class OptParser
      *
      * @param string $code The numeric exit code (e.g., '0', '1', '2')
      * @param string $description Human-readable explanation of when this code is returned
+     *
      * @return self Returns $this for method chaining
      *
      * @example
@@ -311,6 +320,7 @@ final readonly class OptParser
      *
      * @param string $name The environment variable name (e.g., 'DEBUG', 'LOG_LEVEL')
      * @param string $description Human-readable explanation of the variable's effect
+     *
      * @return self Returns $this for method chaining
      *
      * @example
@@ -332,6 +342,7 @@ final readonly class OptParser
      * providing links to extended help resources.
      *
      * @param string $url Fully qualified URL to documentation
+     *
      * @return self Returns $this for method chaining
      *
      * @example
@@ -362,7 +373,9 @@ final readonly class OptParser
      * - Exits with code 0 if --help or --version was requested
      *
      * @param array<int, string>|null $argv Argument array (null uses global $argv)
+     *
      * @return Input Validated input container with options and command
+     *
      * @throws OptParserException On parsing or validation errors
      *
      * @example
@@ -438,7 +451,9 @@ final readonly class OptParser
      * Commands may have context-specific requirement rules applied.
      *
      * @param ParsingResult $result Raw parsing result from syntax parser
+     *
      * @return array<string, mixed> Validated values with defaults applied
+     *
      * @throws UsageException When a required option is missing
      */
     private function validateValues(ParsingResult $result): array
@@ -487,6 +502,7 @@ final readonly class OptParser
      * Determines if the help flag was requested.
      *
      * @param array<int, string> $argv Argument array to check
+     *
      * @return bool True if --help or -h is present
      */
     private function isHelpRequest(array $argv): bool
@@ -504,6 +520,7 @@ final readonly class OptParser
      * Determines if the version flag was requested.
      *
      * @param array<int, string> $argv Argument array to check
+     *
      * @return bool True if --version is present
      */
     private function isVersionRequest(array $argv): bool
@@ -518,6 +535,7 @@ final readonly class OptParser
      * additional sections (examples, exit codes, environment, documentation).
      *
      * @param string $scriptName The script name for usage line display
+     *
      * @return void
      */
     private function printHelp(string $scriptName): void
@@ -574,6 +592,7 @@ final readonly class OptParser
      *
      * @param string $title Section title (will have ':' appended)
      * @param array<int, string> $lines Lines to display under the title
+     *
      * @return void
      */
     private function printArraySection(string $title, array $lines): void
@@ -594,6 +613,7 @@ final readonly class OptParser
      *
      * @param string $title Section title (will have ':' appended)
      * @param array<string, string> $items Key-value pairs to display
+     *
      * @return void
      */
     private function printMapSection(string $title, array $items): void
@@ -613,6 +633,7 @@ final readonly class OptParser
      * Outputs the version string to stdout.
      *
      * @param string $scriptName The script name to display
+     *
      * @return void
      */
     private function printVersion(string $scriptName): void

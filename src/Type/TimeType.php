@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * time values are valid (e.g., rejects 25:00 or 12:60).
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -50,7 +52,9 @@ final readonly class TimeType implements TypeInterface
      * seconds, then verifies the time is semantically valid using strtotime.
      *
      * @param string $value The string to validate as a time
+     *
      * @return string The validated time string unchanged
+     *
      * @throws ValidationException When the format is incorrect or the time is invalid
      */
     public function validate(string $value): string

@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * types are automatically registered on instantiation.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  *
  * @example
@@ -70,7 +72,9 @@ final class TypeRegistry
      * instance for use in value validation and transformation.
      *
      * @param string $name The type name identifier (e.g., 'INT', 'EMAIL')
+     *
      * @return TypeInterface The type validator instance
+     *
      * @throws ValidationException When no type is registered with the given name
      *
      * @example

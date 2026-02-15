@@ -18,7 +18,9 @@ use InvalidArgumentException;
  * normalized to lowercase internally.
  *
  * @package OptParser\Option
+ *
  * @api
+ *
  * @since 1.0.0
  * @see OptionInterface For the contract implemented by registered options
  *
@@ -81,6 +83,7 @@ final class OptionRegistry
      * for type-specific retrieval.
      *
      * @param OptionInterface $option The option to register
+     *
      * @throws InvalidArgumentException When option has no names or name conflicts exist
      *
      * @example
@@ -125,6 +128,7 @@ final class OptionRegistry
      * Name lookup is case-insensitive.
      *
      * @param string $name The option name or alias to check
+     *
      * @return bool True if the option exists
      */
     public function has(string $name): bool
@@ -139,7 +143,9 @@ final class OptionRegistry
      * registered under a different name (alias lookup).
      *
      * @param string $name The option name or alias to look up
+     *
      * @return OptionInterface The matching option
+     *
      * @throws UsageException When no option exists with the given name
      */
     public function get(string $name): OptionInterface
@@ -203,6 +209,7 @@ final class OptionRegistry
      * Normalizes an option name to lowercase for case-insensitive lookup.
      *
      * @param string $name The raw option name
+     *
      * @return string The normalized (lowercase) name
      */
     private function normalizeName(string $name): string

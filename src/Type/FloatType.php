@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * which accepts various decimal formats including scientific notation.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -50,7 +52,9 @@ final readonly class FloatType implements TypeInterface
      * float value, not the original string.
      *
      * @param string $value The string to validate and convert
+     *
      * @return float The validated floating-point value
+     *
      * @throws ValidationException When the value is not a valid float representation
      */
     public function validate(string $value): float

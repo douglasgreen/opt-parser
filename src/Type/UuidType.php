@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * and lowercase hexadecimal digits. Does not validate UUID version or variant.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -49,7 +51,9 @@ final readonly class UuidType implements TypeInterface
      * not verify UUID version, variant, or actual uniqueness.
      *
      * @param string $value The string to validate as a UUID
+     *
      * @return string The validated UUID string unchanged
+     *
      * @throws ValidationException When the UUID format is invalid
      */
     public function validate(string $value): string

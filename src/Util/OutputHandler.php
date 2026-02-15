@@ -14,7 +14,9 @@ use Psr\Log\LoggerInterface;
  * variable convention and optional PSR-3 logger integration for error tracking.
  *
  * @package DouglasGreen\OptParser\Util
+ *
  * @api
+ *
  * @since 1.0.0
  *
  * @example

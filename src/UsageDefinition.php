@@ -15,7 +15,9 @@ use DouglasGreen\OptParser\Exception\UsageException;
  * messages when incompatible option combinations are detected.
  *
  * @package DouglasGreen\OptParser
+ *
  * @api
+ *
  * @since 1.0.0
  *
  * @example
@@ -86,6 +88,7 @@ final class UsageDefinition
      *
      * @param string $command The command name to validate against
      * @param array<string, mixed> $providedOptions Options provided by the user
+     *
      * @throws UsageException When an option is not allowed with the specified command
      */
     public function validate(string $command, array $providedOptions): void
@@ -122,6 +125,7 @@ final class UsageDefinition
      *
      * @param string $command The command name to check against
      * @param string $optionName The option name to validate
+     *
      * @return bool True if the option is allowed with the command
      */
     public function isAllowed(string $command, string $optionName): bool

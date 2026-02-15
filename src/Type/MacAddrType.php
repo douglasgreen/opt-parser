@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * lowercase hex digits.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -56,7 +58,9 @@ final readonly class MacAddrType implements TypeInterface
      * Case-insensitive for hex digits (A-F or a-f).
      *
      * @param string $value The string to validate as a MAC address
+     *
      * @return string The validated MAC address unchanged
+     *
      * @throws ValidationException When the MAC address format is invalid
      */
     public function validate(string $value): string

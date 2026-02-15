@@ -13,7 +13,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * format compliance and actual date validity (e.g., rejects 2024-02-30).
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -46,7 +48,9 @@ final readonly class DateType implements TypeInterface
      * using PHP's strtotime function.
      *
      * @param string $value The string to validate as a date
+     *
      * @return string The validated date string unchanged
+     *
      * @throws ValidationException When the format is incorrect or the date is invalid
      */
     public function validate(string $value): string

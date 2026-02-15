@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * dates, and common date/time string patterns.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -49,7 +51,9 @@ final readonly class DateTimeType implements TypeInterface
      * formats. The original string is returned unchanged.
      *
      * @param string $value The string to validate as a datetime
+     *
      * @return string The validated datetime string unchanged
+     *
      * @throws ValidationException When the string cannot be parsed as a datetime
      */
     public function validate(string $value): string

@@ -13,7 +13,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * and FILTER_FLAG_HOSTNAME, ensuring RFC 952/1123 hostname compliance.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -48,7 +50,9 @@ final readonly class DomainType implements TypeInterface
      * start/end), and dots separating labels.
      *
      * @param string $value The string to validate as a domain name
+     *
      * @return string The validated domain name unchanged
+     *
      * @throws ValidationException When the domain format is invalid
      */
     public function validate(string $value): string

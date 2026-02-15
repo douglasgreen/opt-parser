@@ -12,7 +12,9 @@ namespace DouglasGreen\OptParser\Type;
  * specific format constraints.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -44,6 +46,7 @@ final readonly class StringType implements TypeInterface
      * a passthrough for any string value.
      *
      * @param string $value The string to validate
+     *
      * @return string The input string unchanged
      */
     public function validate(string $value): string

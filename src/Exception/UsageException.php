@@ -14,7 +14,9 @@ use Throwable;
  * Follows the sysexits.h convention with exit code 2 (EX_USAGE) by default.
  *
  * @package OptParser\Exception
+ *
  * @api
+ *
  * @since 1.0.0
  * @see OptParserException For the base exception contract
  * @link https://man.openbsd.org/sysexits.3 sysexits.h exit code conventions

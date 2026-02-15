@@ -12,7 +12,9 @@ namespace DouglasGreen\OptParser;
  * All values are read-only after construction.
  *
  * @package OptParser
+ *
  * @api
+ *
  * @since 1.0.0
  * @see OptParser For the parser that produces Input instances
  *
@@ -59,6 +61,7 @@ final readonly class Input
      * Retrieves an option value by name.
      *
      * @param string $name The option name (primary name as registered)
+     *
      * @return mixed The option value, or null if not present
      */
     public function get(string $name): mixed
@@ -73,6 +76,7 @@ final readonly class Input
      * between "not provided" and "provided with null value".
      *
      * @param string $name The option name to check
+     *
      * @return bool True if the option exists in the parsed input
      */
     public function has(string $name): bool

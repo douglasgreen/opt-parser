@@ -14,7 +14,9 @@ use DouglasGreen\OptParser\Exception\ValidationException;
  * formats without distinction.
  *
  * @package DouglasGreen\OptParser\Type
+ *
  * @api
+ *
  * @since 1.0.0
  * @see TypeInterface For the type contract
  *
@@ -55,7 +57,9 @@ final readonly class IpAddrType implements TypeInterface
      * address ranges separately.
      *
      * @param string $value The string to validate as an IP address
+     *
      * @return string The validated IP address unchanged
+     *
      * @throws ValidationException When the IP address format is invalid
      */
     public function validate(string $value): string

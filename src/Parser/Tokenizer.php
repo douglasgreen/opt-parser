@@ -13,7 +13,9 @@ namespace DouglasGreen\OptParser\Parser;
  * attached option values.
  *
  * @package DouglasGreen\OptParser\Parser
+ *
  * @api
+ *
  * @since 1.0.0
  * @see Token For the token value object
  * @see SyntaxParser For parsing tokens into results
@@ -51,6 +53,7 @@ final class Tokenizer
      * option processing. Handles attached values (e.g., --opt=value, -ovalue).
      *
      * @param array<int, string> $argv Command-line arguments (typically from $_SERVER['argv'])
+     *
      * @return list<Token> List of structured tokens
      *
      * @example
