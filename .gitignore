@@ -2,6 +2,9 @@
 
 # Project-specific settings (put your files here)
 
+# AI
+.aider*
+
 # Bower
 bower_components/
 
