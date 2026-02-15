@@ -5,16 +5,61 @@ declare(strict_types=1);
 namespace DouglasGreen\OptParser\Parser;
 
 /**
- * Converts argv array into structured tokens.
+ * Converts command-line argument arrays into structured tokens.
+ *
+ * Transforms raw argv arrays into a list of Token objects representing
+ * long options, short options, operands, and terminators. Implements
+ * POSIX tokenization rules including handling of -- terminator and
+ * attached option values.
+ *
+ * @package DouglasGreen\OptParser\Parser
+ * @api
+ * @since 1.0.0
+ * @see Token For the token value object
+ * @see SyntaxParser For parsing tokens into results
+ *
+ * @example
+ * ```php
+ * $tokenizer = new Tokenizer();
+ *
+ * $tokens = $tokenizer->tokenize(['script.php', '--verbose', '-o', 'file.txt', '--', 'operand']);
+ * // Produces tokens for: LONG_OPTION(verbose), SHORT_OPTION(o), OPERAND(file.txt),
+ * //                      TERMINATOR(--), OPERAND(operand)
+ *
+ * foreach ($tokens as $token) {
+ *     echo $token->type->name . ': ' . $token->value . PHP_EOL;
+ * }
+ * ```
  */
 final class Tokenizer
 {
+    /**
+     * Flag indicating if the terminator (--) has been encountered.
+     *
+     * Once terminated, all subsequent arguments are treated as operands
+     * regardless of their format.
+     *
+     * @var bool
+     */
     private bool $terminated = false;
 
     /**
-     * @param array<int, string> $argv
+     * Tokenizes an argv array into a list of Token objects.
      *
-     * @return list<Token>
+     * Processes each argument according to POSIX rules: long options
+     * start with --, short options start with -, and -- terminates
+     * option processing. Handles attached values (e.g., --opt=value, -ovalue).
+     *
+     * @param array<int, string> $argv Command-line arguments (typically from $_SERVER['argv'])
+     * @return list<Token> List of structured tokens
+     *
+     * @example
+     * ```php
+     * $tokens = $tokenizer->tokenize(['--config=my.ini', '-v', 'input.txt']);
+     * // $tokens[0] = Token(LONG_OPTION, 'config', 'my.ini')
+     * // $tokens[1] = Token(SHORT_OPTION, 'v')
+     * // $tokens[2] = Token(OPERAND, 'input.txt')
+     * ```
      */
     public function tokenize(array $argv): array
     {
@@ -48,11 +93,28 @@ final class Tokenizer
         return $tokens;
     }
 
+    /**
+     * Returns whether the tokenizer encountered a terminator (--).
+     *
+     * After a terminator, all remaining arguments are treated as operands.
+     * This method is useful for understanding the tokenization state.
+     *
+     * @return bool True if -- was encountered, false otherwise
+     */
     public function isTerminated(): bool
     {
         return $this->terminated;
     }
 
+    /**
+     * Tokenizes a long option argument (e.g., --verbose, --output=file).
+     *
+     * Parses the argument to extract the option name and any attached value
+     * following an equals sign.
+     *
+     * @param string $arg The long option argument without the -- prefix handling
+     * @param list<Token> $tokens The token array to append to (passed by reference)
+     */
     private function tokenizeLongOption(string $arg, array &$tokens): void
     {
         $eqPos = strpos($arg, '=');
@@ -66,6 +128,16 @@ final class Tokenizer
         }
     }
 
+    /**
+     * Tokenizes a short option argument (e.g., -v, -abc, -ofile).
+     *
+     * Handles single short options, clustered flags (-abc), and attached
+     * values (-ovalue). Distinguishes between numeric attached values
+     * and clustered flags based on character type.
+     *
+     * @param string $arg The short option argument starting with -
+     * @param list<Token> $tokens The token array to append to (passed by reference)
+     */
     private function tokenizeShortOption(string $arg, array &$tokens): void
     {
         $chars = substr($arg, 1);

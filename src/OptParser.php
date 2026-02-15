@@ -20,24 +20,83 @@ use DouglasGreen\OptParser\Util\OutputHandler;
 use DouglasGreen\OptParser\Util\SignalHandler;
 
 /**
- * Main API for POSIX-compliant command-line parsing.
+ * Provides the primary API for POSIX-compliant command-line argument parsing.
+ *
+ * This class serves as the main entry point for defining and parsing CLI options,
+ * commands, flags, and arguments. It follows POSIX conventions while providing
+ * a fluent interface for configuration and comprehensive validation capabilities.
+ *
+ * ## Usage
+ * Instantiate with program metadata, then chain option definitions before parsing:
+ *
+ * @package OptParser
+ * @api
+ * @since 1.0.0
+ * @see Input For the parsed result container
+ * @see UsageException For CLI syntax errors
+ * @see ValidationException For type validation errors
+ *
+ * @example
+ * ```php
+ * $parser = new OptParser('myapp', 'A sample application', '1.0.0');
+ * $parser->addCommand(['status'], 'Show status')
+ *        ->addFlag(['v', 'verbose'], 'Enable verbose output')
+ *        ->addParam(['f', 'file'], 'string', 'Input file', required: true);
+ *
+ * try {
+ *     $input = $parser->parse();
+ *     if ($input->get('verbose')) {
+ *         echo "Verbose mode enabled\n";
+ *     }
+ * } catch (OptParserException $e) {
+ *     exit($e->getExitCode());
+ * }
+ * ```
  */
 final readonly class OptParser
 {
+    /**
+     * Registry containing all defined options, commands, and flags.
+     */
     private OptionRegistry $optionRegistry;
 
+    /**
+     * Registry for type validators used during value validation.
+     */
     private TypeRegistry $typeRegistry;
 
+    /**
+     * Tokenizer for converting raw argv into parseable tokens.
+     */
     private Tokenizer $tokenizer;
 
+    /**
+     * Definition of per-command usage constraints.
+     */
     private UsageDefinition $usageDefinition;
 
+    /**
+     * Handler for POSIX signal management (SIGINT, SIGTERM).
+     */
     private ?SignalHandler $signalHandler;
 
+    /**
+     * Handler for formatted stdout/stderr output.
+     */
     private OutputHandler $outputHandler;
 
+    /**
+     * Container for optional help sections (examples, exit codes, etc.).
+     */
     private HelpSections $helpSections;
 
+    /**
+     * Constructs a new OptParser with program metadata.
+     *
+     * @param string $programName The executable name displayed in help output
+     * @param string $description A brief description of the program's purpose
+     * @param string $version Semantic version string (default: '1.0.0')
+     */
     public function __construct(
         private string $programName,
         private string $description,
@@ -53,7 +112,20 @@ final readonly class OptParser
     }
 
     /**
-     * @param array{0: string, 1?: string} $names
+     * Registers a subcommand with the parser.
+     *
+     * Commands allow grouping related functionality under distinct subcommands
+     * (e.g., `git status`, `git commit`). Each command has its own option set
+     * defined via addUsage().
+     *
+     * @param array{0: string, 1?: string} $names Command names (primary name required, alias optional)
+     * @param string $description Human-readable description for help output
+     * @return self Returns $this for method chaining
+     *
+     * @example
+     * ```php
+     * $parser->addCommand(['status', 'st'], 'Show repository status');
+     * ```
      */
     public function addCommand(array $names, string $description): self
     {
@@ -62,7 +134,24 @@ final readonly class OptParser
     }
 
     /**
-     * @param array{0: string, 1?: string} $names
+     * Registers a parameter option that accepts a typed value.
+     *
+     * Parameters are options that require an argument value (e.g., `--file path.txt`).
+     * The value is validated against the specified type and optional filter closure.
+     *
+     * @param array{0: string, 1?: string} $names Option names (short and/or long form)
+     * @param string $type Value type (e.g., 'string', 'int', 'float', 'path')
+     * @param string $description Human-readable description for help output
+     * @param Closure(mixed): mixed|null $filter Optional transformation/filter closure
+     * @param bool $required Whether the option must be provided (default: false)
+     * @param mixed $default Default value if option not provided (default: null)
+     * @return self Returns $this for method chaining
+     *
+     * @example
+     * ```php
+     * $parser->addParam(['f', 'file'], 'path', 'Input file', required: true)
+     *        ->addParam(['n', 'count'], 'int', 'Number of items', default: 10);
+     * ```
      */
     public function addParam(
         array $names,
@@ -79,7 +168,21 @@ final readonly class OptParser
     }
 
     /**
-     * @param array{0: string, 1?: string} $names
+     * Registers a boolean flag option.
+     *
+     * Flags are presence-based options that resolve to true when provided
+     * and false when omitted (e.g., `--verbose`, `-v`). Multiple flag names
+     * can share the same option via short and long forms.
+     *
+     * @param array{0: string, 1?: string} $names Option names (short and/or long form)
+     * @param string $description Human-readable description for help output
+     * @return self Returns $this for method chaining
+     *
+     * @example
+     * ```php
+     * $parser->addFlag(['v', 'verbose'], 'Enable verbose output')
+     *        ->addFlag(['q', 'quiet'], 'Suppress all output');
+     * ```
      */
     public function addFlag(array $names, string $description): self
     {
@@ -87,6 +190,25 @@ final readonly class OptParser
         return $this;
     }
 
+    /**
+     * Registers a positional term (argument).
+     *
+     * Terms are positional arguments that appear after options and commands.
+     * They are parsed in order of definition and validated against the specified type.
+     *
+     * @param string $name Argument identifier used to retrieve the value
+     * @param string $type Value type (e.g., 'string', 'int', 'path')
+     * @param string $description Human-readable description for help output
+     * @param bool $required Whether the argument must be provided (default: true)
+     * @param Closure(mixed): mixed|null $filter Optional transformation/filter closure
+     * @return self Returns $this for method chaining
+     *
+     * @example
+     * ```php
+     * $parser->addTerm('source', 'path', 'Source file', required: true)
+     *        ->addTerm('destination', 'path', 'Destination file', required: false);
+     * ```
+     */
     public function addTerm(
         string $name,
         string $type,
@@ -101,7 +223,21 @@ final readonly class OptParser
     }
 
     /**
-     * @param array<int, string> $optionNames
+     * Defines which options are valid for a specific subcommand.
+     *
+     * This restricts the valid option set for a command, enabling different
+     * commands to accept different options. Options not listed will cause
+     * a usage error when used with that command.
+     *
+     * @param string $command The command name to configure
+     * @param array<int, string> $optionNames List of valid option names for this command
+     * @return self Returns $this for method chaining
+     *
+     * @example
+     * ```php
+     * $parser->addUsage('commit', ['message', 'file', 'verbose']);
+     * $parser->addUsage('push', ['remote', 'branch', 'force']);
+     * ```
      */
     public function addUsage(string $command, array $optionNames): self
     {
@@ -110,7 +246,19 @@ final readonly class OptParser
     }
 
     /**
-     * Add a single example line to the help output.
+     * Adds a usage example line to the help output.
+     *
+     * Examples appear in the 'Examples:' section of the help message,
+     * providing users with common invocation patterns.
+     *
+     * @param string $line A single example command line (without shell prompt)
+     * @return self Returns $this for method chaining
+     *
+     * @example
+     * ```php
+     * $parser->addExample('myapp status --verbose')
+     *        ->addExample('myapp commit -m "Initial commit"');
+     * ```
      */
     public function addExample(string $line): self
     {
@@ -119,7 +267,21 @@ final readonly class OptParser
     }
 
     /**
-     * Add a single exit code and description to the help output.
+     * Documents a process exit code in the help output.
+     *
+     * Exit codes appear in the 'Exit Codes:' section, helping users
+     * understand the meaning of different return values for scripting.
+     *
+     * @param string $code The numeric exit code (e.g., '0', '1', '2')
+     * @param string $description Human-readable explanation of when this code is returned
+     * @return self Returns $this for method chaining
+     *
+     * @example
+     * ```php
+     * $parser->addExitCode('0', 'Success')
+     *        ->addExitCode('1', 'General error')
+     *        ->addExitCode('2', 'Usage error');
+     * ```
      */
     public function addExitCode(string $code, string $description): self
     {
@@ -128,7 +290,20 @@ final readonly class OptParser
     }
 
     /**
-     * Add a single environment variable and description to the help output.
+     * Documents an environment variable in the help output.
+     *
+     * Environment variables appear in the 'Environment:' section,
+     * informing users of runtime configuration options.
+     *
+     * @param string $name The environment variable name (e.g., 'DEBUG', 'LOG_LEVEL')
+     * @param string $description Human-readable explanation of the variable's effect
+     * @return self Returns $this for method chaining
+     *
+     * @example
+     * ```php
+     * $parser->addEnvironment('DEBUG', 'Enable debug logging')
+     *        ->addEnvironment('LOG_LEVEL', 'Set log verbosity (0-3)');
+     * ```
      */
     public function addEnvironment(string $name, string $description): self
     {
@@ -137,7 +312,19 @@ final readonly class OptParser
     }
 
     /**
-     * Add a single documentation URL to the help output.
+     * Adds a documentation URL to the help output.
+     *
+     * Documentation URLs appear in the 'Documentation:' section,
+     * providing links to extended help resources.
+     *
+     * @param string $url Fully qualified URL to documentation
+     * @return self Returns $this for method chaining
+     *
+     * @example
+     * ```php
+     * $parser->addDocumentation('https://example.com/docs/myapp')
+     *        ->addDocumentation('https://wiki.example.com/myapp');
+     * ```
      */
     public function addDocumentation(string $url): self
     {
@@ -146,11 +333,30 @@ final readonly class OptParser
     }
 
     /**
-     * Parse command line arguments.
+     * Parses command line arguments and returns the validated input.
      *
-     * @param array<int, string>|null $argv If null, uses global $argv
+     * This method tokenizes, parses, validates, and returns the input. It handles
+     * automatic help and version display before parsing. Signal handlers are
+     * registered for graceful interruption handling.
      *
-     * @throws OptParserException on parsing or validation errors
+     * Preconditions:
+     * - Options must be registered before calling parse()
+     * - If $argv is null, global $_SERVER['argv'] will be used
+     *
+     * Postconditions:
+     * - Returns Input with validated values and applied defaults
+     * - Exits with code 0 if --help or --version was requested
+     *
+     * @param array<int, string>|null $argv Argument array (null uses global $argv)
+     * @return Input Validated input container with options and command
+     * @throws OptParserException On parsing or validation errors
+     *
+     * @example
+     * ```php
+     * $input = $parser->parse();
+     * // Or with explicit arguments:
+     * $input = $parser->parse(['--verbose', 'status']);
+     * ```
      */
     public function parse(?array $argv = null): Input
     {
@@ -201,11 +407,26 @@ final readonly class OptParser
         }
     }
 
+    /**
+     * Returns the parser's configured version string.
+     *
+     * @return string The semantic version string
+     */
     public function getVersion(): string
     {
         return $this->version;
     }
 
+    /**
+     * Validates raw parsed values against registered option types.
+     *
+     * Applies type validation, filters, default values, and checks required options.
+     * Commands may have context-specific requirement rules applied.
+     *
+     * @param ParsingResult $result Raw parsing result from syntax parser
+     * @return array<string, mixed> Validated values with defaults applied
+     * @throws UsageException When a required option is missing
+     */
     private function validateValues(ParsingResult $result): array
     {
         $validated = [];
@@ -248,6 +469,12 @@ final readonly class OptParser
         return $validated;
     }
 
+    /**
+     * Determines if the help flag was requested.
+     *
+     * @param array<int, string> $argv Argument array to check
+     * @return bool True if --help or -h is present
+     */
     private function isHelpRequest(array $argv): bool
     {
         foreach ($argv as $arg) {
@@ -259,11 +486,26 @@ final readonly class OptParser
         return false;
     }
 
+    /**
+     * Determines if the version flag was requested.
+     *
+     * @param array<int, string> $argv Argument array to check
+     * @return bool True if --version is present
+     */
     private function isVersionRequest(array $argv): bool
     {
         return in_array('--version', $argv, true);
     }
 
+    /**
+     * Outputs the formatted help message to stdout.
+     *
+     * Displays usage, description, commands, options, and any configured
+     * additional sections (examples, exit codes, environment, documentation).
+     *
+     * @param string $scriptName The script name for usage line display
+     * @return void
+     */
     private function printHelp(string $scriptName): void
     {
         $this->outputHandler->stdout(sprintf('Usage: %s [options] [command] [args]', basename($scriptName)));
@@ -314,7 +556,11 @@ final readonly class OptParser
     }
 
     /**
-     * @param array<int, string> $lines
+     * Outputs a titled section with a list of lines.
+     *
+     * @param string $title Section title (will have ':' appended)
+     * @param array<int, string> $lines Lines to display under the title
+     * @return void
      */
     private function printArraySection(string $title, array $lines): void
     {
@@ -330,7 +576,11 @@ final readonly class OptParser
     }
 
     /**
-     * @param array<string, string> $items
+     * Outputs a titled section with key-value pairs.
+     *
+     * @param string $title Section title (will have ':' appended)
+     * @param array<string, string> $items Key-value pairs to display
+     * @return void
      */
     private function printMapSection(string $title, array $items): void
     {
@@ -345,6 +595,12 @@ final readonly class OptParser
         }
     }
 
+    /**
+     * Outputs the version string to stdout.
+     *
+     * @param string $scriptName The script name to display
+     * @return void
+     */
     private function printVersion(string $scriptName): void
     {
         $this->outputHandler->stdout(sprintf('%s %s', $scriptName, $this->version));

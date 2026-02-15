@@ -10,18 +10,62 @@ use DouglasGreen\OptParser\Option\OptionInterface;
 use DouglasGreen\OptParser\Option\OptionRegistry;
 
 /**
- * POSIX.1-2017 compliant syntax parser.
+ * POSIX.1-2017 compliant syntax parser for command-line arguments.
+ *
+ * Transforms a stream of tokens into a structured parsing result by applying
+ * POSIX option parsing rules. Handles long options, short options, clustered
+ * flags, option values, commands, and operands according to the POSIX.1-2017
+ * specification.
+ *
+ * @package DouglasGreen\OptParser\Parser
+ * @api
+ * @since 1.0.0
+ * @see Tokenizer For token generation from raw argv arrays
+ * @see ParsingResult For the output structure
+ *
+ * @example
+ * ```php
+ * $registry = new OptionRegistry();
+ * $registry->register(new Flag(['verbose', 'v'], 'Enable verbose output'));
+ * $registry->register(new Param(['output', 'o'], 'Output file', 'STRING'));
+ *
+ * $tokenizer = new Tokenizer();
+ * $tokens = $tokenizer->tokenize(['-v', '--output', 'result.txt']);
+ *
+ * $parser = new SyntaxParser($registry);
+ * $result = $parser->parse($tokens);
+ * ```
  */
 final readonly class SyntaxParser
 {
+    /**
+     * Initializes the syntax parser with an option registry.
+     *
+     * @param OptionRegistry $optionRegistry Registry containing known options and commands
+     */
     public function __construct(
         private OptionRegistry $optionRegistry,
     ) {}
 
     /**
-     * @param list<Token> $tokens
+     * Parses a list of tokens into a structured parsing result.
      *
-     * @throws UsageException on syntax violations
+     * Processes tokens according to POSIX syntax rules, extracting commands,
+     * options with their values, and operands. Handles value consumption for
+     * parameters that require values and validates against the option registry.
+     *
+     * @param list<Token> $tokens Tokens produced by the Tokenizer
+     * @return ParsingResult Structured result containing mapped options and operands
+     * @throws UsageException When syntax violations occur (unknown options, missing values, multiple commands)
+     *
+     * @example
+     * ```php
+     * $tokens = $tokenizer->tokenize($argv);
+     * $result = $parser->parse($tokens);
+     *
+     * $command = $result->command;
+     * $verbose = $result->mappedOptions['verbose'] ?? false;
+     * ```
      */
     public function parse(array $tokens): ParsingResult
     {
@@ -88,6 +132,18 @@ final readonly class SyntaxParser
         return $result;
     }
 
+    /**
+     * Parses a long option token (e.g., --verbose, --output=file).
+     *
+     * Resolves the option name against the registry, handles attached values,
+     * and sets up value consumption for options requiring separate value tokens.
+     *
+     * @param Token $token The long option token to parse
+     * @param ParsingResult $result The parsing result to populate
+     * @param bool $expectingValue Reference flag indicating if a value is expected
+     * @param OptionInterface|null $currentOption Reference to the option awaiting a value
+     * @throws UsageException When the option is unknown or other syntax errors occur
+     */
     private function parseLongOption(Token $token, ParsingResult $result, bool &$expectingValue, ?OptionInterface &$currentOption): void
     {
         $name = $token->value;
@@ -123,6 +179,18 @@ final readonly class SyntaxParser
         }
     }
 
+    /**
+     * Parses a short option token (e.g., -v, -ofile).
+     *
+     * Resolves the option name against the registry, handles attached values,
+     * and sets up value consumption for options requiring separate value tokens.
+     *
+     * @param Token $token The short option token to parse
+     * @param ParsingResult $result The parsing result to populate
+     * @param bool $expectingValue Reference flag indicating if a value is expected
+     * @param OptionInterface|null $currentOption Reference to the option awaiting a value
+     * @throws UsageException When the option is unknown or other syntax errors occur
+     */
     private function parseShortOption(
         Token $token,
         ParsingResult $result,
@@ -162,6 +230,15 @@ final readonly class SyntaxParser
         }
     }
 
+    /**
+     * Processes operands and maps them to defined terms.
+     *
+     * Assigns positional operands to their corresponding term definitions
+     * in order. Extra operands that don't match defined terms are stored
+     * in the '_' key for later access.
+     *
+     * @param ParsingResult $result The parsing result containing operands to process
+     */
     private function processOperands(ParsingResult $result): void
     {
         $terms = $this->optionRegistry->getTerms();
