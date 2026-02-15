@@ -40,6 +40,7 @@ final readonly class SyntaxParser
                     $currentOption = null;
                     continue;
                 }
+
                 throw new UsageException(sprintf("Option '%s' requires a value", $currentOption->getPrimaryName()));
             }
 

@@ -95,7 +95,16 @@ $optParser
     // Flags (boolean switches)
     ->addFlag(['verbose', 'v'], 'Enable verbose output')
     ->addFlag(['quiet', 'q'], 'Suppress non-error output')
-    ->addFlag(['force', 'f'], 'Force operation without confirmation');
+    ->addFlag(['force', 'f'], 'Force operation without confirmation')
+
+    // Help Sections
+    ->addExample('user-manager add alice alice@example.com -p secret')
+    ->addExample('user-manager delete bob --force')
+    ->addExitCode('0', 'Successful execution')
+    ->addExitCode('1', 'General error')
+    ->addExitCode('2', 'Usage error')
+    ->addEnvironment('NO_COLOR', 'Disable colored output')
+    ->addDocumentation('https://github.com/douglasgreen/opt-parser');
 
 // Define usage patterns (which options go with which commands)
 $optParser
@@ -243,6 +252,65 @@ $optParser->addParam(
         return $value;
     }
 );
+```
+
+#### Help Sections
+
+You can add additional sections to the automatically generated help output to provide examples, document exit codes, environment variables, and links to documentation. The help output automatically uses the script filename in the usage line (e.g., `Usage: script.php [options]`).
+
+Each method adds one item to the respective section:
+
+```php
+$optParser
+    ->addExample('user-manager add alice alice@example.com -p secret')
+    ->addExample('user-manager delete bob --force')
+    ->addExitCode('0', 'Successful execution')
+    ->addExitCode('1', 'General error')
+    ->addExitCode('2', 'Usage error')
+    ->addEnvironment('NO_COLOR', 'Disable colored output')
+    ->addDocumentation('https://github.com/douglasgreen/opt-parser');
+```
+
+Resulting `--help` output:
+
+```
+Usage: example.php [options] [command] [args]
+
+Manage system user accounts
+
+Commands:
+  add, a        Add a new user
+  delete, d     Delete an existing user
+  list, l       List all users
+
+Options:
+  --username    Username of the user
+  --email       Email address of the user
+  --password, -p <value>        Password for the user
+  --role, -r <value>    Role of the user
+  --output, -o <value>  Output file path
+  --verbose, -v Enable verbose output
+  --quiet, -q   Suppress non-error output
+  --force, -f   Force operation without confirmation
+
+Options:
+  -h, --help     Display this help message
+  --version      Display version information
+
+Examples:
+  user-manager add alice alice@example.com -p secret
+  user-manager delete bob --force
+
+Exit Codes:
+  0   Successful execution
+  1   General error
+  2   Usage error
+
+Environment:
+  NO_COLOR   Disable colored output
+
+Documentation:
+  https://github.com/douglasgreen/opt-parser
 ```
 
 #### Signal Handling

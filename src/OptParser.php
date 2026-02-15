@@ -36,6 +36,8 @@ final readonly class OptParser
 
     private OutputHandler $outputHandler;
 
+    private HelpSections $helpSections;
+
     public function __construct(
         private string $programName,
         private string $description,
@@ -47,6 +49,7 @@ final readonly class OptParser
         $this->usageDefinition = new UsageDefinition();
         $this->outputHandler = new OutputHandler();
         $this->signalHandler = new SignalHandler($this->outputHandler);
+        $this->helpSections = new HelpSections();
     }
 
     /**
@@ -107,6 +110,42 @@ final readonly class OptParser
     }
 
     /**
+     * Add a single example line to the help output.
+     */
+    public function addExample(string $line): self
+    {
+        $this->helpSections->examples[] = $line;
+        return $this;
+    }
+
+    /**
+     * Add a single exit code and description to the help output.
+     */
+    public function addExitCode(string $code, string $description): self
+    {
+        $this->helpSections->exitCodes[$code] = $description;
+        return $this;
+    }
+
+    /**
+     * Add a single environment variable and description to the help output.
+     */
+    public function addEnvironment(string $name, string $description): self
+    {
+        $this->helpSections->environment[$name] = $description;
+        return $this;
+    }
+
+    /**
+     * Add a single documentation URL to the help output.
+     */
+    public function addDocumentation(string $url): self
+    {
+        $this->helpSections->documentation[] = $url;
+        return $this;
+    }
+
+    /**
      * Parse command line arguments.
      *
      * @param array<int, string>|null $argv If null, uses global $argv
@@ -117,23 +156,26 @@ final readonly class OptParser
     {
         $this->signalHandler?->register();
 
+        $scriptName = $this->programName;
+
         if ($argv === null) {
             global $_SERVER;
             $argv = $_SERVER['argv'] ?? [];
             // Remove script name which is always index 0 in standard CLI execution
             if (isset($argv[0])) {
+                $scriptName = $argv[0];
                 array_shift($argv);
             }
         }
 
         // Handle help/version flags
         if ($this->isHelpRequest($argv)) {
-            $this->printHelp();
+            $this->printHelp($scriptName);
             exit(0);
         }
 
         if ($this->isVersionRequest($argv)) {
-            $this->printVersion();
+            $this->printVersion($scriptName);
             exit(0);
         }
 
@@ -189,7 +231,7 @@ final readonly class OptParser
                 // Context check
                 if ($result->command !== null) {
                     $checkRequired = $this->usageDefinition->isAllowed($result->command, $name);
-                } elseif (!empty($this->optionRegistry->getCommands())) {
+                } elseif ($this->optionRegistry->getCommands() !== []) {
                     // Global context with subcommands defined: strict requirements disabled
                     // to allow user script to handle "missing command" error.
                     $checkRequired = false;
@@ -222,9 +264,9 @@ final readonly class OptParser
         return in_array('--version', $argv, true);
     }
 
-    private function printHelp(): void
+    private function printHelp(string $scriptName): void
     {
-        $this->outputHandler->stdout(sprintf('Usage: %s [options] [command] [args]', $this->programName));
+        $this->outputHandler->stdout(sprintf('Usage: %s [options] [command] [args]', basename($scriptName)));
         $this->outputHandler->stdout('');
         $this->outputHandler->stdout($this->description);
         $this->outputHandler->stdout('');
@@ -264,10 +306,47 @@ final readonly class OptParser
         $this->outputHandler->stdout('Options:');
         $this->outputHandler->stdout('  -h, --help     Display this help message');
         $this->outputHandler->stdout('  --version      Display version information');
+
+        $this->printArraySection('Examples', $this->helpSections->examples);
+        $this->printMapSection('Exit Codes', $this->helpSections->exitCodes);
+        $this->printMapSection('Environment', $this->helpSections->environment);
+        $this->printArraySection('Documentation', $this->helpSections->documentation);
     }
 
-    private function printVersion(): void
+    /**
+     * @param array<int, string> $lines
+     */
+    private function printArraySection(string $title, array $lines): void
     {
-        $this->outputHandler->stdout(sprintf('%s %s', $this->programName, $this->version));
+        if ($lines === []) {
+            return;
+        }
+
+        $this->outputHandler->stdout('');
+        $this->outputHandler->stdout($title . ':');
+        foreach ($lines as $line) {
+            $this->outputHandler->stdout('  ' . $line);
+        }
+    }
+
+    /**
+     * @param array<string, string> $items
+     */
+    private function printMapSection(string $title, array $items): void
+    {
+        if ($items === []) {
+            return;
+        }
+
+        $this->outputHandler->stdout('');
+        $this->outputHandler->stdout($title . ':');
+        foreach ($items as $name => $description) {
+            $this->outputHandler->stdout(sprintf('  %s   %s', $name, $description));
+        }
+    }
+
+    private function printVersion(string $scriptName): void
+    {
+        $this->outputHandler->stdout(sprintf('%s %s', $scriptName, $this->version));
     }
 }
