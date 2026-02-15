@@ -57,36 +57,50 @@ final readonly class OptParser
 {
     /**
      * Registry containing all defined options, commands, and flags.
+     *
+     * @var OptionRegistry
      */
     private OptionRegistry $optionRegistry;
 
     /**
      * Registry for type validators used during value validation.
+     *
+     * @var TypeRegistry
      */
     private TypeRegistry $typeRegistry;
 
     /**
      * Tokenizer for converting raw argv into parseable tokens.
+     *
+     * @var Tokenizer
      */
     private Tokenizer $tokenizer;
 
     /**
      * Definition of per-command usage constraints.
+     *
+     * @var UsageDefinition
      */
     private UsageDefinition $usageDefinition;
 
     /**
      * Handler for POSIX signal management (SIGINT, SIGTERM).
+     *
+     * @var SignalHandler|null
      */
     private ?SignalHandler $signalHandler;
 
     /**
      * Handler for formatted stdout/stderr output.
+     *
+     * @var OutputHandler
      */
     private OutputHandler $outputHandler;
 
     /**
      * Container for optional help sections (examples, exit codes, etc.).
+     *
+     * @var HelpSections
      */
     private HelpSections $helpSections;
 

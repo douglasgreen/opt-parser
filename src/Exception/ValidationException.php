@@ -7,7 +7,7 @@ namespace DouglasGreen\OptParser\Exception;
 use Throwable;
 
 /**
- * Represents validation errors caused by type mismatches or invalid argument formats.
+ * Represents errors caused by type mismatches or invalid argument formats.
  *
  * This exception is thrown when option or argument values fail type validation,
  * such as when a non-numeric string is provided for an integer argument.
