@@ -14,6 +14,9 @@ abstract readonly class AbstractOption implements OptionInterface
     /** @var list<string> */
     protected array $names;
 
+    /**
+     * @param array<string> $names
+     */
     public function __construct(
         array $names,
         protected string $description,

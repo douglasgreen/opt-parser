@@ -15,6 +15,9 @@ use Override;
  */
 final readonly class Param extends AbstractOption
 {
+    /**
+     * @param array<string> $names
+     */
     public function __construct(
         array $names,
         string $description,
