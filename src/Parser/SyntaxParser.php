@@ -82,8 +82,7 @@ final readonly class SyntaxParser
             // If we were expecting a value for previous option, consume this token
             if ($expectingValue && $currentOption instanceof OptionInterface) {
                 if ($token->type === TokenType::OPERAND || $token->type === TokenType::VALUE) {
-                    $result->mappedOptions[$currentOption->getPrimaryName()] = $token->value;
-                    $result->rawValues[$currentOption->getPrimaryName()] = $token->value;
+                    $this->addOptionValue($result, $currentOption, $token->value);
                     $expectingValue = false;
                     $currentOption = null;
                     continue;
@@ -170,17 +169,14 @@ final readonly class SyntaxParser
 
         if ($option->acceptsValue()) {
             if ($token->attachedValue !== null) {
-                $result->mappedOptions[$option->getPrimaryName()] = $token->attachedValue;
-                $result->rawValues[$option->getPrimaryName()] = $token->attachedValue;
+                $this->addOptionValue($result, $option, $token->attachedValue);
             } else {
                 // Set flag to consume next token as value
                 $expectingValue = true;
                 $currentOption = $option;
             }
         } else {
-            $result->mappedOptions[$option->getPrimaryName()] = true;
-            // Set rawValue so it is processed during validation
-            $result->rawValues[$option->getPrimaryName()] = 'true';
+            $this->addFlagOccurrence($result, $option);
         }
     }
 
@@ -222,17 +218,67 @@ final readonly class SyntaxParser
 
         if ($option->acceptsValue()) {
             if ($token->attachedValue !== null) {
-                $result->mappedOptions[$option->getPrimaryName()] = $token->attachedValue;
-                $result->rawValues[$option->getPrimaryName()] = $token->attachedValue;
+                $this->addOptionValue($result, $option, $token->attachedValue);
             } else {
                 // Set flag to consume next token as value
                 $expectingValue = true;
                 $currentOption = $option;
             }
         } else {
-            $result->mappedOptions[$option->getPrimaryName()] = true;
-            // Set rawValue so it is processed during validation
-            $result->rawValues[$option->getPrimaryName()] = 'true';
+            $this->addFlagOccurrence($result, $option);
+        }
+    }
+
+    /**
+     * Adds a value for a parameter option, handling multiple values.
+     *
+     * For options with multiple=true, values are collected in an array.
+     * For single-value options, the value is stored directly.
+     *
+     * @param ParsingResult $result The parsing result to populate
+     * @param OptionInterface $option The option receiving the value
+     * @param string $value The value to add
+     */
+    private function addOptionValue(ParsingResult $result, OptionInterface $option, string $value): void
+    {
+        $name = $option->getPrimaryName();
+
+        if ($option->isMultiple()) {
+            if (!isset($result->mappedOptions[$name])) {
+                $result->mappedOptions[$name] = [];
+                $result->rawValues[$name] = [];
+            }
+            $result->mappedOptions[$name][] = $value;
+            $result->rawValues[$name][] = $value;
+        } else {
+            $result->mappedOptions[$name] = $value;
+            $result->rawValues[$name] = $value;
+        }
+    }
+
+    /**
+     * Records a flag occurrence, handling multiple occurrences.
+     *
+     * For flags with multiple=true, occurrences are counted.
+     * For single flags, the presence is marked as true.
+     *
+     * @param ParsingResult $result The parsing result to populate
+     * @param OptionInterface $option The flag option being recorded
+     */
+    private function addFlagOccurrence(ParsingResult $result, OptionInterface $option): void
+    {
+        $name = $option->getPrimaryName();
+
+        if ($option->isMultiple()) {
+            if (!isset($result->mappedOptions[$name])) {
+                $result->mappedOptions[$name] = 0;
+                $result->rawValues[$name] = [];
+            }
+            $result->mappedOptions[$name]++;
+            $result->rawValues[$name][] = 'true';
+        } else {
+            $result->mappedOptions[$name] = true;
+            $result->rawValues[$name] = 'true';
         }
     }
 

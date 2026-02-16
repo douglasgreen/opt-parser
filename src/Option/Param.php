@@ -69,6 +69,7 @@ final readonly class Param extends AbstractOption
         private bool $required = false,
         private mixed $default = null,
         private ?Closure $filter = null,
+        private bool $multiple = false,
     ) {
         parent::__construct($names, $description);
     }
@@ -95,13 +96,28 @@ final readonly class Param extends AbstractOption
     }
 
     /**
+     * Returns whether this parameter accepts multiple values.
+     *
+     * @return bool True if multiple values accepted, false otherwise
+     */
+    #[Override]
+    public function isMultiple(): bool
+    {
+        return $this->multiple;
+    }
+
+    /**
      * Returns the configured default value.
      *
-     * @return mixed The default value (may be null if not configured)
+     * For multiple parameters, returns an empty array. Otherwise returns
+     * the configured default value or null.
+     *
+     * @return mixed The default value
      */
+    #[Override]
     public function getDefault(): mixed
     {
-        return $this->default;
+        return $this->multiple ? [] : $this->default;
     }
 
     /**

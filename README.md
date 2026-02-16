@@ -291,6 +291,60 @@ error: term 'username' has invalid argument '123': Not a valid string
 
 ### Advanced Features
 
+#### Multiple-Value Parameters
+
+Parameters can accept multiple values by setting the `multiple` parameter to `true`. Each occurrence of the option adds a value to an array:
+
+```php
+// Multiple-value parameter - collect multiple ignore paths
+$optParser->addParam(['ignore', 'i'], 'STRING', 'Paths to ignore', null, false, null, true);
+```
+
+**Usage example:**
+```bash
+# Ignore multiple paths
+php cleanup.php --ignore path1 --ignore path2 --ignore path3
+```
+
+**Accessing values:**
+```php
+$ignorePaths = $input->get('ignore'); // Returns array: ['path1', 'path2', 'path3']
+
+foreach ($ignorePaths as $path) {
+    echo "Ignoring: $path\n";
+}
+```
+
+#### Multiple-Occurrence Flags
+
+Flags can be specified multiple times to increment a counter by setting the `multiple` parameter to `true`:
+
+```php
+// Multiple-occurrence flag - increase verbosity level
+$optParser->addFlag(['verbose', 'v'], 'Increase verbosity (can be repeated)', true);
+```
+
+**Usage example:**
+```bash
+# Increase verbosity level
+php app.php -v -v -v
+# Or with long options
+php app.php --verbose --verbose --verbose
+```
+
+**Accessing values:**
+```php
+$verbosity = $input->get('verbose'); // Returns int: 3
+
+if ($verbosity >= 3) {
+    echo "Debug mode enabled\n";
+} elseif ($verbosity >= 2) {
+    echo "Detailed output\n";
+} elseif ($verbosity >= 1) {
+    echo "Verbose output\n";
+}
+```
+
 #### Custom Validation Filters
 
 Apply custom logic to any parameter or term:

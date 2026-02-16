@@ -41,6 +41,21 @@ use DouglasGreen\OptParser\Type\TypeRegistry;
 final readonly class Flag extends AbstractOption
 {
     /**
+     * Constructs a flag option.
+     *
+     * @param array<string> $names Option names (primary first, aliases follow)
+     * @param string $description Human-readable description for help output
+     * @param bool $multiple Whether this flag can be specified multiple times (default: false)
+     */
+    public function __construct(
+        array $names,
+        string $description,
+        private bool $multiple = false,
+    ) {
+        parent::__construct($names, $description);
+    }
+
+    /**
      * Confirms that flags do not accept value arguments.
      *
      * @return bool Always returns false

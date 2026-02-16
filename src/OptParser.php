@@ -162,13 +162,15 @@ final readonly class OptParser
      * @param Closure(mixed): mixed|null $filter Optional transformation/filter closure
      * @param bool $required Whether the option must be provided (default: false)
      * @param mixed $default Default value if option not provided (default: null)
+     * @param bool $multiple Whether this parameter accepts multiple values (default: false)
      *
      * @return self Returns $this for method chaining
      *
      * @example
      * ```php
      * $parser->addParam(['f', 'file'], 'path', 'Input file', required: true)
-     *        ->addParam(['n', 'count'], 'int', 'Number of items', default: 10);
+     *        ->addParam(['n', 'count'], 'int', 'Number of items', default: 10)
+     *        ->addParam(['ignore', 'i'], 'path', 'Paths to ignore', multiple: true);
      * ```
      */
     public function addParam(
@@ -178,9 +180,10 @@ final readonly class OptParser
         ?Closure $filter = null,
         bool $required = false,
         mixed $default = null,
+        bool $multiple = false,
     ): self {
         $this->optionRegistry->register(
-            new Param($names, $description, $type, $required, $default, $filter),
+            new Param($names, $description, $type, $required, $default, $filter, $multiple),
         );
         return $this;
     }
@@ -192,20 +195,25 @@ final readonly class OptParser
      * and false when omitted (e.g., `--verbose`, `-v`). Multiple flag names
      * can share the same option via short and long forms.
      *
+     * When multiple is true, each occurrence increments a counter instead of
+     * returning a boolean (e.g., `-v -v -v` returns 3).
+     *
      * @param array{0: string, 1?: string} $names Option names (short and/or long form)
      * @param string $description Human-readable description for help output
+     * @param bool $multiple Whether this flag can be specified multiple times (default: false)
      *
      * @return self Returns $this for method chaining
      *
      * @example
      * ```php
      * $parser->addFlag(['v', 'verbose'], 'Enable verbose output')
-     *        ->addFlag(['q', 'quiet'], 'Suppress all output');
+     *        ->addFlag(['q', 'quiet'], 'Suppress all output')
+     *        ->addFlag(['d', 'debug'], 'Increase debug level (can be repeated)', multiple: true);
      * ```
      */
-    public function addFlag(array $names, string $description): self
+    public function addFlag(array $names, string $description, bool $multiple = false): self
     {
-        $this->optionRegistry->register(new Flag($names, $description));
+        $this->optionRegistry->register(new Flag($names, $description, $multiple));
         return $this;
     }
 
