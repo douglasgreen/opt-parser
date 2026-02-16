@@ -60,6 +60,15 @@ run_test "List verbose" 0 "admin@example.com" list -v
 run_test "List to file" 0 "SUCCESS" list -o /tmp/test_users.txt -v
 run_test "List invalid path" 1 "Directory not writable" list -o /nonexistent/path/file.txt
 
+# SEARCH Command Tests (Multiple Terms)
+echo "## SEARCH Command Tests (Multiple Terms)"
+run_test "Search single user" 0 "admin" search admin
+run_test "Search multiple users" 0 "jane_smith" search admin jane_smith bob_wilson
+run_test "Search with verbose" 0 "admin@example.com" search admin -v
+run_test "Search non-existent user" 1 "Not found" search nonexistent
+run_test "Search mixed found/not-found" 0 "admin" search admin nonexistent john_doe
+run_test "Search with short alias" 0 "admin" s admin jane_smith
+
 # Edge Cases
 echo "## Edge Cases"
 run_test "No command" 2 "No command specified"

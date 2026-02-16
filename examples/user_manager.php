@@ -14,12 +14,16 @@ $optParser = new OptParser('User Manager', 'Manage system user accounts');
 $optParser
     ->addCommand(['add', 'a'], 'Add a new user')
     ->addCommand(['delete', 'd'], 'Delete an existing user')
-    ->addCommand(['list', 'l'], 'List all users');
+    ->addCommand(['list', 'l'], 'List all users')
+    ->addCommand(['search', 's'], 'Search for users by username');
 
 // Define terms (positional arguments) - note: required is 4th param
 $optParser
     ->addTerm('username', 'STRING', 'Username of the user', true)
     ->addTerm('email', 'EMAIL', 'Email address of the user', false);
+
+// Define multiple-value term for search command (accepts one or more usernames)
+$optParser->addTerm('usernames', 'STRING', 'One or more usernames to search for', true, null, true);
 
 // Define parameters - note the parameter order: names, type, description, filter, required, default
 $optParser
@@ -37,7 +41,8 @@ $optParser
 $optParser
     ->addUsage('add', ['username', 'email', 'password', 'role', 'verbose', 'quiet'])
     ->addUsage('delete', ['username', 'force', 'verbose'])
-    ->addUsage('list', ['output', 'verbose']);
+    ->addUsage('list', ['output', 'verbose'])
+    ->addUsage('search', ['usernames', 'verbose']);
 
 // Parse arguments
 try {
@@ -171,6 +176,50 @@ switch ($command) {
             $output('SUCCESS: Listed ' . count($users) . ' users');
         }
         exit(0);
+
+    case 'search':
+        $usernames = $input->get('usernames');
+
+        if ($verbose) {
+            $output('Operation: SEARCH');
+            $output('  Usernames: ' . implode(', ', $usernames));
+        }
+
+        // Simulated user database
+        $allUsers = [
+            'admin' => ['role' => 'admin', 'email' => 'admin@example.com'],
+            'john_doe' => ['role' => 'user', 'email' => 'john@example.com'],
+            'jane_smith' => ['role' => 'editor', 'email' => 'jane@example.com'],
+            'bob_wilson' => ['role' => 'user', 'email' => 'bob@example.com'],
+        ];
+
+        $found = [];
+        $notFound = [];
+
+        foreach ($usernames as $name) {
+            if (isset($allUsers[$name])) {
+                $found[$name] = $allUsers[$name];
+            } else {
+                $notFound[] = $name;
+            }
+        }
+
+        if ($notFound !== []) {
+            $output('Not found: ' . implode(', ', $notFound), true);
+        }
+
+        if ($found !== []) {
+            foreach ($found as $name => $data) {
+                if ($verbose) {
+                    echo sprintf('%-15s %-10s %s', $name, $data['role'], $data['email']) . PHP_EOL;
+                } else {
+                    echo $name . PHP_EOL;
+                }
+            }
+            $output('SUCCESS: Found ' . count($found) . ' user(s)');
+        }
+
+        exit($found !== [] ? 0 : 1);
 
     default:
         $output("Error: Unknown command '$command'", true);
