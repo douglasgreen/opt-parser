@@ -83,6 +83,7 @@ switch ($command) {
         $email = $input->get('email');
         $password = $input->get('password');
         $role = $input->get('role') ?? 'user';
+        $tags = $input->get('tag');  // array for multiple param
 
         if (!$username) {
             $output('Error: Username is required for add operation', true);
@@ -107,6 +108,8 @@ switch ($command) {
             $output('  Email: ' . ($email ?? 'N/A'));
             $output("  Role: $role");
             $output('  Password: ' . ($password ? str_repeat('*', strlen($password)) : 'N/A'));
+            $output('  Tags: ' . ($tags ? implode(', ', $tags) : 'N/A'));
+            $output("  Verbosity level: $verbosity");
         }
 
         if (!$password) {
@@ -120,8 +123,9 @@ switch ($command) {
             exit(1);
         }
 
-        // Direct output to satisfy test expectation in quiet mode
-        echo "SUCCESS: Added user '$username' with role '$role'" . PHP_EOL;
+        // Build success message with tags if provided
+        $tagMsg = $tags ? ' with tags: ' . implode(', ', $tags) : '';
+        echo "SUCCESS: Added user '$username' with role '$role'$tagMsg" . PHP_EOL;
         exit(0);
 
     case 'delete':
