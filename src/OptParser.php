@@ -87,10 +87,8 @@ final readonly class OptParser
 
     /**
      * Handler for POSIX signal management (SIGINT, SIGTERM).
-     *
-     * @var SignalHandler|null
      */
-    private ?SignalHandler $signalHandler;
+    private SignalHandler $signalHandler;
 
     /**
      * Handler for formatted stdout/stderr output.
@@ -398,7 +396,7 @@ final readonly class OptParser
      */
     public function parse(?array $argv = null): Input
     {
-        $this->signalHandler?->register();
+        $this->signalHandler->register();
 
         $scriptName = $this->programName;
 

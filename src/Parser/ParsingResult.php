@@ -28,6 +28,6 @@ final class ParsingResult
     /** @var array<int, string> */
     public array $operands = [];
 
-    /** @var array<string, string> */
+    /** @var array<string, array<int, string>|string> */
     public array $rawValues = [];
 }

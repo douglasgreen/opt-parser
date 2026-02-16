@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DouglasGreen\OptParser\Option;
 
 use DouglasGreen\OptParser\Type\TypeRegistry;
+use Override;
 
 /**
  * Represents a boolean command-line flag that requires no value argument.
