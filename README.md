@@ -87,6 +87,9 @@ $optParser
     ->addTerm('username', 'STRING', 'Username of the user')
     ->addTerm('email', 'EMAIL', 'Email address of the user')
 
+    // Term accepting multiple values (e.g., for batch operations)
+    ->addTerm('files', 'INFILE', 'One or more files to process', true, null, true)
+
     // Parameters (named arguments with values)
     ->addParam(['password', 'p'], 'STRING', 'Password for the user')
     ->addParam(['role', 'r'], 'STRING', 'Role of the user')
@@ -146,6 +149,25 @@ switch ($command) {
         $verbose = $input->get('verbose') ?? false;
         // Implementation...
         break;
+
+    case 'batch-delete':
+        // Multiple-value term example: delete multiple users at once
+        $usernames = $input->get('usernames'); // Returns array
+        $force = $input->get('force') ?? false;
+
+        if (empty($usernames)) {
+            echo "Error: At least one username is required\n";
+            exit(2);
+        }
+
+        foreach ($usernames as $username) {
+            if ($force) {
+                echo "Deleted user: $username\n";
+            } else {
+                echo "Would delete user: $username (use --force to confirm)\n";
+            }
+        }
+        break;
 }
 ```
 
@@ -157,8 +179,44 @@ The parser supports four option categories:
 |------|-------------|------------------|---------|
 | **Command** | Subcommand selector (first positional) | Utility operand | `git clone` |
 | **Term** | Positional argument with validation | Utility operand | `file.txt` |
+| **Term (multiple)** | Positional argument accepting one or more values | Utility operand(s) | `file1.txt file2.txt file3.txt` |
 | **Param** | Option requiring an argument | Option with operand | `-o file` or `--output=file` |
 | **Flag** | Boolean option without argument | Option without operand | `-v` or `--verbose` |
+
+### Multiple-Value Terms
+
+Terms can accept one or more values by setting the `multiple` parameter to `true`. When enabled, the term collects all remaining positional arguments into an array:
+
+```php
+// Single-value term (default)
+$optParser->addTerm('username', 'STRING', 'Username of the user');
+
+// Multiple-value term - collects one or more usernames
+$optParser->addTerm('usernames', 'STRING', 'One or more usernames', true, null, true);
+```
+
+**Usage example:**
+```bash
+# Search for multiple users
+php user-manager.php search alice bob charlie
+
+# Delete multiple files
+php cleanup.php file1.txt file2.txt file3.txt
+```
+
+**Accessing values:**
+```php
+$usernames = $input->get('usernames'); // Returns array: ['alice', 'bob', 'charlie']
+
+foreach ($usernames as $username) {
+    echo "Processing: $username\n";
+}
+```
+
+**Important notes:**
+- A multiple-value term consumes all remaining positional arguments
+- If multiple terms are defined, only the last one should have `multiple: true`
+- The value is always returned as an array (empty array if no values provided)
 
 ### POSIX Option Syntax Details
 
