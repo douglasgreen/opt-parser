@@ -69,6 +69,26 @@ run_test "Search non-existent user" 1 "Not found" search nonexistent
 run_test "Search mixed found/not-found" 0 "admin" search admin nonexistent john_doe
 run_test "Search with short alias" 0 "admin" s admin jane_smith
 
+# Multiple Parameter Tests
+echo "## Multiple Parameter Tests"
+run_test "Add user with multiple tags" 0 "tags: admin, developer" add testuser -p secret123 --tag admin --tag developer
+run_test "Add user with short tag alias" 0 "tags: dev, qa" add testuser -p secret123 -t dev -t qa
+run_test "Search with tags filter" 0 "Tags: tag1, tag2" search admin --tag tag1 --tag tag2 -v
+
+# Multiple Flag Tests (Verbosity Levels)
+echo "## Multiple Flag Tests (Verbosity Levels)"
+run_test "Verbosity level 1 (-v)" 0 "Verbosity level: 1" add testuser -p secret123 -v
+run_test "Verbosity level 2 (-v -v)" 0 "Verbosity level: 2" add testuser -p secret123 -v -v
+run_test "Verbosity level 3 (-v -v -v)" 0 "Verbosity level: 3" add testuser -p secret123 -v -v -v
+run_test "Verbosity level 2 (mixed)" 0 "Verbosity level: 2" add testuser -p secret123 -v --verbose
+run_test "Verbosity level 4 (extreme)" 0 "Verbosity level: 4" add testuser -p secret123 -vvvv
+run_test "Search with verbosity 2" 0 "Verbosity level: 2" search admin -vv
+
+# Combined Multiple Params and Flags
+echo "## Combined Multiple Params and Flags"
+run_test "Add with tags and verbosity" 0 "tags: tester, reviewer.*Verbosity level: 2" add newuser -p secret123 --tag tester --tag reviewer -vv
+run_test "Search with tags and high verbosity" 0 "Tags: important, verified.*Verbosity level: 3" search admin --tag important --tag verified -vvv
+
 # Edge Cases
 echo "## Edge Cases"
 run_test "No command" 2 "No command specified"

@@ -35,10 +35,10 @@ $optParser
 
 // Define usage patterns
 $optParser
-    ->addUsage('add', ['usernames', 'password', 'role', 'email', 'verbose', 'quiet'])
+    ->addUsage('add', ['usernames', 'password', 'role', 'email', 'tag', 'verbose', 'quiet'])
     ->addUsage('delete', ['usernames', 'force', 'verbose'])
     ->addUsage('list', ['output', 'verbose'])
-    ->addUsage('search', ['usernames', 'verbose']);
+    ->addUsage('search', ['usernames', 'verbose', 'tag']);
 
 // Parse arguments
 try {
@@ -64,7 +64,8 @@ if ($command === null) {
 
 // Helper for conditional output
 $quiet = $input->get('quiet') ?? false;
-$verbose = $input->get('verbose') ?? false;
+$verbosity = $input->get('verbose'); // int for multiple flags (0, 1, 2, 3, etc.)
+$verbose = $verbosity > 0;
 
 $output = function (string $message, bool $isError = false) use ($quiet): void {
     if ($quiet && !$isError) {
