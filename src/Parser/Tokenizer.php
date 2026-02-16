@@ -154,17 +154,19 @@ final class Tokenizer
         $first = $chars[0];
         $rest = substr($chars, 1);
 
-        if (!ctype_digit($rest)) {
-            // Likely an attached argument like -ovalue or -abc (clustered)
-            $tokens[] = new Token(TokenType::SHORT_OPTION, $first, $rest);
-        } else {
-            // Clustered flags like -abc
+        // Check if all characters are the same (like -vvvv for repeated flags)
+        if (str_repeat($first, strlen($chars)) === $chars) {
+            // Repeated flag: expand to separate tokens
             $len = strlen($chars);
-            for ($j = 0; $j < $len - 1; $j++) {
+            for ($j = 0; $j < $len; $j++) {
                 $tokens[] = new Token(TokenType::SHORT_OPTION, $chars[$j]);
             }
-
-            $tokens[] = new Token(TokenType::SHORT_OPTION, $chars[$len - 1]);
+        } elseif (ctype_digit($rest)) {
+            // Numeric attached value like -n123
+            $tokens[] = new Token(TokenType::SHORT_OPTION, $first, $rest);
+        } else {
+            // Attached value like -ofile
+            $tokens[] = new Token(TokenType::SHORT_OPTION, $first, $rest);
         }
     }
 }
