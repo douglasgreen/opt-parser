@@ -475,7 +475,10 @@ final readonly class OptParser
         foreach ($result->rawValues as $name => $value) {
             $option = $this->optionRegistry->get($name);
 
-            if (is_array($value)) {
+            // For multiple flags, use the pre-computed count from mappedOptions
+            if ($option->isMultiple() && !$option->acceptsValue()) {
+                $validated[$name] = $result->mappedOptions[$name];
+            } elseif (is_array($value)) {
                 // Multiple values - validate each one
                 $validated[$name] = [];
                 foreach ($value as $item) {
