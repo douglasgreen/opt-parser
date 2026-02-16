@@ -248,7 +248,9 @@ final readonly class SyntaxParser
                 $result->mappedOptions[$name] = [];
                 $result->rawValues[$name] = [];
             }
+
             $result->mappedOptions[$name][] = $value;
+            $result->rawValues[$name] = (array) $result->rawValues[$name];
             $result->rawValues[$name][] = $value;
         } else {
             $result->mappedOptions[$name] = $value;
@@ -274,7 +276,9 @@ final readonly class SyntaxParser
                 $result->mappedOptions[$name] = 0;
                 $result->rawValues[$name] = [];
             }
+
             $result->mappedOptions[$name]++;
+            $result->rawValues[$name] = (array) $result->rawValues[$name];
             $result->rawValues[$name][] = 'true';
         } else {
             $result->mappedOptions[$name] = true;
@@ -300,19 +304,22 @@ final readonly class SyntaxParser
         foreach ($result->operands as $operand) {
             if (isset($terms[$termIndex])) {
                 $term = $terms[$termIndex];
+                $primaryName = $term->getPrimaryName();
 
                 if ($term->isMultiple()) {
                     // Collect multiple operands for this term
-                    if (!isset($result->mappedOptions[$term->getPrimaryName()])) {
-                        $result->mappedOptions[$term->getPrimaryName()] = [];
-                        $result->rawValues[$term->getPrimaryName()] = [];
+                    if (!isset($result->mappedOptions[$primaryName])) {
+                        $result->mappedOptions[$primaryName] = [];
+                        $result->rawValues[$primaryName] = [];
                     }
-                    $result->mappedOptions[$term->getPrimaryName()][] = $operand;
-                    $result->rawValues[$term->getPrimaryName()][] = $operand;
+
+                    $result->mappedOptions[$primaryName][] = $operand;
+                    $result->rawValues[$primaryName] = (array) $result->rawValues[$primaryName];
+                    $result->rawValues[$primaryName][] = $operand;
                     // Don't increment termIndex - keep collecting for this term
                 } else {
-                    $result->mappedOptions[$term->getPrimaryName()] = $operand;
-                    $result->rawValues[$term->getPrimaryName()] = $operand;
+                    $result->mappedOptions[$primaryName] = $operand;
+                    $result->rawValues[$primaryName] = $operand;
                     $termIndex++;
                 }
             } else {

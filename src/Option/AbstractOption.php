@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DouglasGreen\OptParser\Option;
 
+use DouglasGreen\OptParser\Exception\ValidationException;
 use DouglasGreen\OptParser\Type\TypeRegistry;
 
 /**
@@ -130,7 +131,7 @@ abstract readonly class AbstractOption implements OptionInterface
      *
      * @return mixed The validated and possibly transformed value
      *
-     * @throws \DouglasGreen\OptParser\Exception\ValidationException When the value fails type validation
+     * @throws ValidationException When the value fails type validation
      */
     abstract public function validateValue(string $value, TypeRegistry $registry): mixed;
 }

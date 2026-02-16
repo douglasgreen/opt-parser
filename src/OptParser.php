@@ -85,9 +85,7 @@ final readonly class OptParser
      */
     private UsageDefinition $usageDefinition;
 
-    /**
-     * Handler for POSIX signal management (SIGINT, SIGTERM).
-     */
+    /** Handler for POSIX signal management (SIGINT, SIGTERM). */
     private SignalHandler $signalHandler;
 
     /**
