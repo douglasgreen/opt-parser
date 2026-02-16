@@ -75,10 +75,16 @@ $output = function (string $message, bool $isError = false) use ($quiet): void {
 
 switch ($command) {
     case 'add':
-        $username = $input->get('username');
+        $usernames = $input->get('usernames');
+        $username = $usernames[0] ?? null;
         $email = $input->get('email');
         $password = $input->get('password');
         $role = $input->get('role') ?? 'user';
+
+        if (!$username) {
+            $output('Error: Username is required for add operation', true);
+            exit(2);
+        }
 
         // Fallback for test case where password is provided after -- terminator
         if (!$password) {
