@@ -21,7 +21,11 @@ run_test() {
     output=$($SCRIPT "$@" 2>&1)
     exit_code=$?
 
-    if [ $exit_code -eq $expected_exit ] && echo "$output" | grep -q "$expected_pattern"; then
+    # Convert output to single line for pattern matching (handles multiline patterns)
+    local single_line_output
+    single_line_output=$(echo "$output" | tr '\n' ' ')
+
+    if [ $exit_code -eq $expected_exit ] && echo "$single_line_output" | grep -q "$expected_pattern"; then
         echo "  ✓ PASS"
         ((PASSED++))
     else
