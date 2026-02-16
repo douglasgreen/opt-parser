@@ -4,3 +4,4 @@
 
 * Applied PHPDoc standards to generate comments.
 * Updated config files.
+* Added support for multiple terms.
