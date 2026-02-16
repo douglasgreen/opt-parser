@@ -240,7 +240,8 @@ final readonly class SyntaxParser
      * Processes operands and maps them to defined terms.
      *
      * Assigns positional operands to their corresponding term definitions
-     * in order. Extra operands that don't match defined terms are stored
+     * in order. For terms with multiple=true, collects all remaining operands
+     * into an array. Extra operands that don't match defined terms are stored
      * in the '_' key for later access.
      *
      * @param ParsingResult $result The parsing result containing operands to process
@@ -253,9 +254,21 @@ final readonly class SyntaxParser
         foreach ($result->operands as $operand) {
             if (isset($terms[$termIndex])) {
                 $term = $terms[$termIndex];
-                $result->mappedOptions[$term->getPrimaryName()] = $operand;
-                $result->rawValues[$term->getPrimaryName()] = $operand;
-                $termIndex++;
+
+                if ($term->isMultiple()) {
+                    // Collect multiple operands for this term
+                    if (!isset($result->mappedOptions[$term->getPrimaryName()])) {
+                        $result->mappedOptions[$term->getPrimaryName()] = [];
+                        $result->rawValues[$term->getPrimaryName()] = [];
+                    }
+                    $result->mappedOptions[$term->getPrimaryName()][] = $operand;
+                    $result->rawValues[$term->getPrimaryName()][] = $operand;
+                    // Don't increment termIndex - keep collecting for this term
+                } else {
+                    $result->mappedOptions[$term->getPrimaryName()] = $operand;
+                    $result->rawValues[$term->getPrimaryName()] = $operand;
+                    $termIndex++;
+                }
             } else {
                 // Extra operands (non-options)
                 $result->mappedOptions['_'][] = $operand;

@@ -220,13 +220,15 @@ final readonly class OptParser
      * @param string $description Human-readable description for help output
      * @param bool $required Whether the argument must be provided (default: true)
      * @param Closure(mixed): mixed|null $filter Optional transformation/filter closure
+     * @param bool $multiple Whether this term accepts multiple values (default: false)
      *
      * @return self Returns $this for method chaining
      *
      * @example
      * ```php
      * $parser->addTerm('source', 'path', 'Source file', required: true)
-     *        ->addTerm('destination', 'path', 'Destination file', required: false);
+     *        ->addTerm('destination', 'path', 'Destination file', required: false)
+     *        ->addTerm('files', 'path', 'Files to process', multiple: true);
      * ```
      */
     public function addTerm(
@@ -235,9 +237,10 @@ final readonly class OptParser
         string $description,
         bool $required = true,
         ?Closure $filter = null,
+        bool $multiple = false,
     ): self {
         $this->optionRegistry->register(
-            new Term($name, $description, $type, $required, $filter),
+            new Term($name, $description, $type, $required, $filter, $multiple),
         );
         return $this;
     }
@@ -463,7 +466,16 @@ final readonly class OptParser
         // 1. Validate provided values
         foreach ($result->rawValues as $name => $value) {
             $option = $this->optionRegistry->get($name);
-            $validated[$name] = $option->validateValue($value, $this->typeRegistry);
+
+            if (is_array($value)) {
+                // Multiple values - validate each one
+                $validated[$name] = [];
+                foreach ($value as $item) {
+                    $validated[$name][] = $option->validateValue($item, $this->typeRegistry);
+                }
+            } else {
+                $validated[$name] = $option->validateValue($value, $this->typeRegistry);
+            }
         }
 
         // 2. Apply defaults and check requirements

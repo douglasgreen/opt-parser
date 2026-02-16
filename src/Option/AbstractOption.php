@@ -92,6 +92,18 @@ abstract readonly class AbstractOption implements OptionInterface
     }
 
     /**
+     * Determines if this option accepts multiple values.
+     *
+     * Default implementation returns false. Subclasses may override.
+     *
+     * @return bool True if multiple values accepted, false otherwise
+     */
+    public function isMultiple(): bool
+    {
+        return false;
+    }
+
+    /**
      * Returns the default value for this option.
      *
      * Default implementation returns null. Subclasses may override.

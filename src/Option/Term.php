@@ -62,6 +62,7 @@ final readonly class Term extends AbstractOption
      * @param string $typeName Registered type name for validation (e.g., 'string', 'int', 'path')
      * @param bool $required Whether the term must be provided (default: true)
      * @param Closure(mixed): mixed|null $filter Optional transformation/filter closure
+     * @param bool $multiple Whether this term accepts multiple values (default: false)
      */
     public function __construct(
         string $name,
@@ -69,6 +70,7 @@ final readonly class Term extends AbstractOption
         private string $typeName,
         private bool $required = true,
         private ?Closure $filter = null,
+        private bool $multiple = false,
     ) {
         parent::__construct([$name], $description);
     }
@@ -92,6 +94,17 @@ final readonly class Term extends AbstractOption
     public function isRequired(): bool
     {
         return $this->required;
+    }
+
+    /**
+     * Returns whether this term accepts multiple values.
+     *
+     * @return bool True if multiple values accepted, false otherwise
+     */
+    #[Override]
+    public function isMultiple(): bool
+    {
+        return $this->multiple;
     }
 
     /**
@@ -125,5 +138,18 @@ final readonly class Term extends AbstractOption
         }
 
         return $typedValue;
+    }
+
+    /**
+     * Returns the default value for this term.
+     *
+     * For multiple terms, returns an empty array. Otherwise returns null.
+     *
+     * @return mixed The default value
+     */
+    #[Override]
+    public function getDefault(): mixed
+    {
+        return $this->multiple ? [] : null;
     }
 }

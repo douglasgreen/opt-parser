@@ -100,9 +100,19 @@ interface OptionInterface
      * - `Flag`: Returns `false`
      * - `Param`: Returns configured default or `null`
      * - `Command`: Returns `null`
-     * - `Term`: Returns `null`
+     * - `Term`: Returns `null` or `[]` for multiple terms
      *
      * @return mixed The default value (type varies by implementation)
      */
     public function getDefault(): mixed;
+
+    /**
+     * Determines if this option accepts multiple values.
+     *
+     * - `true` for Terms with multiple values enabled
+     * - `false` for all other option types
+     *
+     * @return bool True if multiple values are accepted
+     */
+    public function isMultiple(): bool;
 }
