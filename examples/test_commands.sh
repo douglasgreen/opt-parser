@@ -90,7 +90,7 @@ run_test "Search with verbosity 2" 0 "Verbosity level: 2" search admin -vv
 
 # Combined Multiple Params and Flags
 echo "## Combined Multiple Params and Flags"
-run_test "Add with tags and verbosity" 0 "tags: tester, reviewer.*Verbosity level: 2" add newuser -p secret123 --tag tester --tag reviewer -vv
+run_test "Add with tags and verbosity" 0 "Tags: tester, reviewer.*Verbosity level: 2" add newuser -p secret123 --tag tester --tag reviewer -vv
 run_test "Search with tags and high verbosity" 0 "Tags: important, verified.*Verbosity level: 3" search admin --tag important --tag verified -vvv
 
 # Edge Cases
