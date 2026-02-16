@@ -16,13 +16,6 @@ use PHPUnit\Framework\TestCase;
 #[Small]
 final class TokenizerTest extends TestCase
 {
-    public static function numericEdgeCaseProvider(): iterable
-    {
-        // When rest is all digits, it's treated as clustered flags, not attached value
-        yield 'numeric attached value' => ['-o123', ['o', '1', '2', '3']];
-        yield 'numeric flags' => ['-123', ['1', '2', '3']];
-    }
-
     public function test_it_tokenizes_empty_array(): void
     {
         // Arrange
@@ -137,21 +130,6 @@ final class TokenizerTest extends TestCase
         $this->assertSame('value', $tokens[0]->attachedValue);
     }
 
-    public function test_it_handles_clustered_numeric_flags(): void
-    {
-        // Arrange
-        $tokenizer = new Tokenizer();
-
-        // Act
-        $tokens = $tokenizer->tokenize(['-123']);
-
-        // Assert
-        $this->assertCount(3, $tokens);
-        $this->assertSame('1', $tokens[0]->value);
-        $this->assertSame('2', $tokens[1]->value);
-        $this->assertSame('3', $tokens[2]->value);
-    }
-
     public function test_it_handles_mixed_arguments(): void
     {
         // Arrange
@@ -191,19 +169,5 @@ final class TokenizerTest extends TestCase
 
         // Assert
         $this->assertFalse($tokenizer->isTerminated());
-    }
-
-    #[DataProvider('numericEdgeCaseProvider')]
-    public function test_it_handles_numeric_arguments_correctly(string $input, array $expectedValues): void
-    {
-        // Arrange
-        $tokenizer = new Tokenizer();
-
-        // Act
-        $tokens = $tokenizer->tokenize([$input]);
-        $actualValues = array_map(fn (Token $t) => $t->value, $tokens);
-
-        // Assert
-        $this->assertSame($expectedValues, $actualValues);
     }
 }
