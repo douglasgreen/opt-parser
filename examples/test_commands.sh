@@ -50,7 +50,7 @@ run_test "Add user quiet mode" 0 "SUCCESS" add quietuser -p secret123 -q
 echo "## DELETE Command Tests"
 run_test "Delete with force" 0 "SUCCESS" delete testuser --force -v
 run_test "Delete without force" 1 "requires --force" delete testuser
-run_test "Delete missing username" 2 "Option 'username' is required" delete
+run_test "Delete missing username" 2 "Option 'usernames' is required" delete
 run_test "Delete clustered options" 0 "SUCCESS" delete testuser -fv
 
 # LIST Command Tests
