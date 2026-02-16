@@ -39,12 +39,12 @@ echo ""
 
 # ADD Command Tests
 echo "## ADD Command Tests"
-run_test "Add user with all parameters" 0 "SUCCESS" add john john@example.com -p secret123 -r admin -v
-run_test "Add user with short alias" 0 "SUCCESS" a jane jane@example.com --password secret123
-run_test "Add user missing password" 2 "Option 'password' is required" add bob bob@example.com
-run_test "Add user invalid email" 2 "Invalid email" add bob invalid-email -p secret123
-run_test "Add user short password" 1 "at least 6 characters" add bob bob@example.com -p "123"
-run_test "Add user quiet mode" 0 "SUCCESS" add quietuser quiet@example.com -p secret123 -q
+run_test "Add user with all parameters" 0 "SUCCESS" add john -p secret123 -r admin -e john@example.com -v
+run_test "Add user with short alias" 0 "SUCCESS" a jane --password secret123 -e jane@example.com
+run_test "Add user missing password" 2 "Option 'password' is required" add bob -e bob@example.com
+run_test "Add user invalid email" 2 "Invalid email" add bob -e invalid-email -p secret123
+run_test "Add user short password" 1 "at least 6 characters" add bob -p "123"
+run_test "Add user quiet mode" 0 "SUCCESS" add quietuser -p secret123 -q
 
 # DELETE Command Tests
 echo "## DELETE Command Tests"

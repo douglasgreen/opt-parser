@@ -17,13 +17,8 @@ $optParser
     ->addCommand(['list', 'l'], 'List all users')
     ->addCommand(['search', 's'], 'Search for users by username');
 
-// Define terms (positional arguments) - note: required is 4th param
-$optParser
-    ->addTerm('username', 'STRING', 'Username of the user', true)
-    ->addTerm('email', 'EMAIL', 'Email address of the user', false);
-
-// Define multiple-value term for search command (accepts one or more usernames)
-$optParser->addTerm('usernames', 'STRING', 'One or more usernames to search for', true, null, true);
+// Define terms (positional arguments) - usernames accepts one or more values
+$optParser->addTerm('usernames', 'STRING', 'Username(s) to operate on', true, null, true);
 
 // Define parameters - note the parameter order: names, type, description, filter, required, default
 $optParser
@@ -39,8 +34,8 @@ $optParser
 
 // Define usage patterns
 $optParser
-    ->addUsage('add', ['username', 'email', 'password', 'role', 'verbose', 'quiet'])
-    ->addUsage('delete', ['username', 'force', 'verbose'])
+    ->addUsage('add', ['usernames', 'password', 'role', 'email', 'verbose', 'quiet'])
+    ->addUsage('delete', ['usernames', 'force', 'verbose'])
     ->addUsage('list', ['output', 'verbose'])
     ->addUsage('search', ['usernames', 'verbose']);
 
@@ -56,9 +51,10 @@ try {
 $command = $input->getCommand();
 
 if ($command === null) {
-    // If a username term was parsed but no command found, it's likely an unknown command
-    if ($input->get('username')) {
-        fwrite(STDERR, "Error: Unknown command '" . $input->get('username') . "'\n");
+    // If a usernames term was parsed but no command found, it's likely an unknown command
+    $usernames = $input->get('usernames');
+    if ($usernames && count($usernames) > 0) {
+        fwrite(STDERR, "Error: Unknown command '" . $usernames[0] . "'\n");
         exit(2);
     }
     fwrite(STDERR, "Error: No command specified. Use --help for usage information.\n");
@@ -120,7 +116,8 @@ switch ($command) {
         exit(0);
 
     case 'delete':
-        $username = $input->get('username');
+        $usernames = $input->get('usernames');
+        $username = $usernames[0] ?? null;
         $force = $input->get('force') ?? false;
 
         if (!$username) {
