@@ -170,4 +170,36 @@ final class TokenizerTest extends TestCase
         // Assert
         $this->assertFalse($tokenizer->isTerminated());
     }
+
+    public function test_it_expands_repeated_short_flags(): void
+    {
+        // Arrange
+        $tokenizer = new Tokenizer();
+
+        // Act
+        $tokens = $tokenizer->tokenize(['-vvv']);
+
+        // Assert
+        $this->assertCount(3, $tokens);
+        foreach ($tokens as $token) {
+            $this->assertSame(TokenType::SHORT_OPTION, $token->type);
+            $this->assertSame('v', $token->value);
+            $this->assertNull($token->attachedValue);
+        }
+    }
+
+    public function test_it_handles_short_option_with_numeric_attached_value(): void
+    {
+        // Arrange
+        $tokenizer = new Tokenizer();
+
+        // Act
+        $tokens = $tokenizer->tokenize(['-n123']);
+
+        // Assert
+        $this->assertCount(1, $tokens);
+        $this->assertSame(TokenType::SHORT_OPTION, $tokens[0]->type);
+        $this->assertSame('n', $tokens[0]->value);
+        $this->assertSame('123', $tokens[0]->attachedValue);
+    }
 }
