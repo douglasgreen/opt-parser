@@ -82,15 +82,26 @@ final readonly class Flag extends AbstractOption
     }
 
     /**
+     * Returns whether this flag accepts multiple occurrences.
+     *
+     * @return bool True if multiple occurrences accepted, false otherwise
+     */
+    #[Override]
+    public function isMultiple(): bool
+    {
+        return $this->multiple;
+    }
+
+    /**
      * Returns the default value for flags when not provided.
      *
-     * Flags default to `false` when the option is not present on the
-     * command line, and `true` when provided.
+     * For multiple flags, returns 0 (count). Otherwise returns false.
      *
-     * @return bool Always returns false
+     * @return int|bool The default value (0 for multiple, false for single)
      */
-    public function getDefault(): bool
+    #[Override]
+    public function getDefault(): int|bool
     {
-        return false;
+        return $this->multiple ? 0 : false;
     }
 }
