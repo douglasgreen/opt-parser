@@ -20,16 +20,17 @@ $optParser
 // Define terms (positional arguments) - usernames accepts one or more values
 $optParser->addTerm('usernames', 'STRING', 'Username(s) to operate on', true, null, true);
 
-// Define parameters - note the parameter order: names, type, description, filter, required, default
+// Define parameters - note the parameter order: names, type, description, filter, required, default, multiple
 $optParser
     ->addParam(['password', 'p'], 'STRING', 'Password for the user', null, true)  // required=true, no filter
     ->addParam(['role', 'r'], 'STRING', 'Role of the user', null, false, 'user')  // not required, default='user'
     ->addParam(['output', 'o'], 'OUTFILE', 'Output file path', null, false)  // optional param
-    ->addParam(['email', 'e'], 'EMAIL', 'Email address for the user', null, false);  // optional param for add command
+    ->addParam(['email', 'e'], 'EMAIL', 'Email address for the user', null, false)  // optional param for add command
+    ->addParam(['tag', 't'], 'STRING', 'Tags for the user (can be repeated)', null, false, null, true);  // multiple param
 
-// Define flags
+// Define flags - note the flag order: names, description, multiple
 $optParser
-    ->addFlag(['verbose', 'v'], 'Enable verbose output')
+    ->addFlag(['verbose', 'v'], 'Increase verbosity (can be repeated)', true)  // multiple flag for verbosity levels
     ->addFlag(['quiet', 'q'], 'Suppress non-error output')
     ->addFlag(['force', 'f'], 'Force operation without confirmation');
 
@@ -184,10 +185,13 @@ switch ($command) {
 
     case 'search':
         $usernames = $input->get('usernames');
+        $tags = $input->get('tag');  // array for multiple param
 
         if ($verbose) {
             $output('Operation: SEARCH');
             $output('  Usernames: ' . implode(', ', $usernames));
+            $output('  Tags: ' . ($tags ? implode(', ', $tags) : 'N/A'));
+            $output("  Verbosity level: $verbosity");
         }
 
         // Simulated user database
