@@ -24,7 +24,8 @@ $optParser->addTerm('usernames', 'STRING', 'Username(s) to operate on', true, nu
 $optParser
     ->addParam(['password', 'p'], 'STRING', 'Password for the user', null, true)  // required=true, no filter
     ->addParam(['role', 'r'], 'STRING', 'Role of the user', null, false, 'user')  // not required, default='user'
-    ->addParam(['output', 'o'], 'OUTFILE', 'Output file path', null, false);  // optional param
+    ->addParam(['output', 'o'], 'OUTFILE', 'Output file path', null, false)  // optional param
+    ->addParam(['email', 'e'], 'EMAIL', 'Email address for the user', null, false);  // optional param for add command
 
 // Define flags
 $optParser
