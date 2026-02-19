@@ -316,7 +316,7 @@ Errors are written to **stderr** with descriptive messages. The parser distingui
 
 Example error output:
 ```
-error: unrecognized option '--verbos'
+error: Unknown option '--verbos'
 error: option '--output' requires an argument
 error: term 'username' has invalid argument '123': Not a valid string
 ```

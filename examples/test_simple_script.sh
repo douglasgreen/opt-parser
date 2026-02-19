@@ -45,7 +45,7 @@ run_test "Basic execution" 0 "Processing test.txt" test.txt
 run_test "With verbose flag" 0 "Verbose mode enabled.*Processing test.txt" test.txt -v
 run_test "With output param" 0 "Saving to out.txt" test.txt -o out.txt
 run_test "Missing required term" 2 "Option 'input' is required"
-run_test "Unknown option" 2 "unrecognized option" test.txt --unknown
+run_test "Unknown option" 2 "Unknown option" test.txt --unknown
 
 echo "=== Test Summary ==="
 echo "Passed: $PASSED"
