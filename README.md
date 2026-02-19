@@ -215,6 +215,28 @@ The parser supports four option categories:
 | **Param** | Option requiring an argument | Option with operand | `-o file` or `--output=file` |
 | **Flag** | Boolean option without argument | Option without operand | `-v` or `--verbose` |
 
+### Option Name Resolution
+
+When defining options with multiple names (aliases), the parser designates an **official name** used for storing and retrieving values. This ensures consistent access regardless of which alias was used on the command line.
+
+**Resolution Rules:**
+1. **First Long Name**: If one or more long names (length > 1) are provided, the first long name is used.
+2. **First Short Name**: If only short names are provided, the first short name is used.
+
+**Example:**
+```php
+// Names: short 'p', long 'pass', long 'password'
+$optParser->addParam(['p', 'pass', 'password'], 'STRING', 'Password');
+
+// User provides: --password secret
+// Official name is 'pass' (first long name)
+$input->get('pass'); // Returns 'secret'
+$input->get('password'); // Returns null (not the official name)
+$input->get('p'); // Returns null (not the official name)
+```
+
+This behavior applies to Commands, Parameters, and Flags.
+
 ### Multiple-Value Terms
 
 Terms can accept one or more values by setting the `multiple` parameter to `true`. When enabled, the term collects all remaining positional arguments into an array:
