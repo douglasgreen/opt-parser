@@ -96,7 +96,7 @@ run_test "Search with tags and high verbosity" 0 "Tags: important, verified.*Ver
 # Official Name Aliasing Tests
 echo "## Official Name Aliasing Tests"
 run_test "Command alias (i -> info)" 0 "Command: info" i
-run_test "Param alias (-c -> config)" 0 "Config: /tmp/config.ini" info -c /tmp/config.ini
+run_test "Param alias (-c -> config)" 0 "Config: my_config_string" info -c my_config_string
 run_test "Flag alias (-j -> json)" 0 "\"json\":true" info -j
 
 # Edge Cases

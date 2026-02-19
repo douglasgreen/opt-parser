@@ -28,7 +28,7 @@ $optParser
     ->addParam(['output', 'o'], 'OUTFILE', 'Output file path', null, false)  // optional param
     ->addParam(['email', 'e'], 'EMAIL', 'Email address for the user', null, false)  // optional param for add command
     ->addParam(['tag', 't'], 'STRING', 'Tags for the user (can be repeated)', null, false, null, true)  // multiple param
-    ->addParam(['config', 'c'], 'INFILE', 'Config file'); // Example: Param with alias
+    ->addParam(['config', 'c'], 'STRING', 'Config string'); // Example: Param with alias (changed to STRING for testing)
 
 // Define flags - note the flag order: names, description, multiple
 $optParser
