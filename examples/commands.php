@@ -15,7 +15,8 @@ $optParser
     ->addCommand(['add', 'a'], 'Add a new user')
     ->addCommand(['delete', 'd'], 'Delete an existing user')
     ->addCommand(['list', 'l'], 'List all users')
-    ->addCommand(['search', 's'], 'Search for users by username');
+    ->addCommand(['search', 's'], 'Search for users by username')
+    ->addCommand(['info', 'i'], 'Show system info'); // Example: Command with alias
 
 // Define terms (positional arguments) - usernames accepts one or more values
 $optParser->addTerm('usernames', 'STRING', 'Username(s) to operate on', true, null, true);
@@ -26,20 +27,23 @@ $optParser
     ->addParam(['role', 'r'], 'STRING', 'Role of the user', null, false, 'user')  // not required, default='user'
     ->addParam(['output', 'o'], 'OUTFILE', 'Output file path', null, false)  // optional param
     ->addParam(['email', 'e'], 'EMAIL', 'Email address for the user', null, false)  // optional param for add command
-    ->addParam(['tag', 't'], 'STRING', 'Tags for the user (can be repeated)', null, false, null, true);  // multiple param
+    ->addParam(['tag', 't'], 'STRING', 'Tags for the user (can be repeated)', null, false, null, true)  // multiple param
+    ->addParam(['config', 'c'], 'INFILE', 'Config file'); // Example: Param with alias
 
 // Define flags - note the flag order: names, description, multiple
 $optParser
     ->addFlag(['verbose', 'v'], 'Increase verbosity (can be repeated)', true)  // multiple flag for verbosity levels
     ->addFlag(['quiet', 'q'], 'Suppress non-error output')
-    ->addFlag(['force', 'f'], 'Force operation without confirmation');
+    ->addFlag(['force', 'f'], 'Force operation without confirmation')
+    ->addFlag(['json', 'j'], 'Output in JSON format'); // Example: Flag with alias
 
 // Define usage patterns
 $optParser
     ->addUsage('add', ['usernames', 'password', 'role', 'email', 'tag', 'verbose', 'quiet'])
     ->addUsage('delete', ['usernames', 'force', 'verbose'])
     ->addUsage('list', ['output', 'verbose'])
-    ->addUsage('search', ['usernames', 'verbose', 'tag']);
+    ->addUsage('search', ['usernames', 'verbose', 'tag'])
+    ->addUsage('info', ['config', 'json']); // Usage for new command
 
 // Parse arguments
 try {
@@ -233,6 +237,32 @@ switch ($command) {
         }
 
         exit($found !== [] ? 0 : 1);
+
+    case 'info':
+        // Example of Command aliasing: 'i' maps to official name 'info'
+        // Example of Param aliasing: 'c' maps to official name 'config'
+        // Example of Flag aliasing: 'j' maps to official name 'json'
+        $config = $input->get('config');
+        $json = $input->get('json');
+
+        if ($verbose) {
+            $output('Operation: INFO');
+            $output('  Config: ' . ($config ?? 'N/A'));
+            $output('  JSON: ' . ($json ? 'yes' : 'no'));
+        }
+
+        if ($json) {
+            echo json_encode([
+                'command' => $command,
+                'config' => $config,
+                'json' => $json
+            ]) . PHP_EOL;
+        } else {
+            echo "Command: $command" . PHP_EOL;
+            echo "Config: " . ($config ?? 'N/A') . PHP_EOL;
+            echo "JSON: " . ($json ? 'yes' : 'no') . PHP_EOL;
+        }
+        exit(0);
 
     default:
         $output("Error: Unknown command '$command'", true);

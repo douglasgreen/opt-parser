@@ -93,6 +93,12 @@ echo "## Combined Multiple Params and Flags"
 run_test "Add with tags and verbosity" 0 "Tags: tester, reviewer.*Verbosity level: 2" add newuser -p secret123 --tag tester --tag reviewer -vv
 run_test "Search with tags and high verbosity" 0 "Tags: important, verified.*Verbosity level: 3" search admin --tag important --tag verified -vvv
 
+# Official Name Aliasing Tests
+echo "## Official Name Aliasing Tests"
+run_test "Command alias (i -> info)" 0 "Command: info" i
+run_test "Param alias (-c -> config)" 0 "Config: /tmp/config.ini" info -c /tmp/config.ini
+run_test "Flag alias (-j -> json)" 0 "\"json\":true" info -j
+
 # Edge Cases
 echo "## Edge Cases"
 run_test "No command" 2 "No command specified"
