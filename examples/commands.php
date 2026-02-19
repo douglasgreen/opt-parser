@@ -255,12 +255,12 @@ switch ($command) {
             echo json_encode([
                 'command' => $command,
                 'config' => $config,
-                'json' => $json
+                'json' => $json,
             ]) . PHP_EOL;
         } else {
             echo "Command: $command" . PHP_EOL;
-            echo "Config: " . ($config ?? 'N/A') . PHP_EOL;
-            echo "JSON: " . ($json ? 'yes' : 'no') . PHP_EOL;
+            echo 'Config: ' . ($config ?? 'N/A') . PHP_EOL;
+            echo 'JSON: ' . ($json ? 'yes' : 'no') . PHP_EOL;
         }
         exit(0);
 

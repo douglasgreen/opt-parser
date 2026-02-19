@@ -718,6 +718,7 @@ final readonly class OptParser
      * If no long names exist, the first short name is used.
      *
      * @param OptionInterface $option The option to inspect
+     *
      * @return string The official name
      */
     private function getOfficialName(OptionInterface $option): string
@@ -728,6 +729,7 @@ final readonly class OptParser
                 return $name;
             }
         }
+
         return $names[0];
     }
 }
