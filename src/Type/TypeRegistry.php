@@ -62,7 +62,7 @@ final class TypeRegistry
      */
     public function register(TypeInterface $type): void
     {
-        $this->types[$type->getName()] = $type;
+        $this->types[strtoupper($type->getName())] = $type;
     }
 
     /**
@@ -85,11 +85,13 @@ final class TypeRegistry
      */
     public function get(string $name): TypeInterface
     {
-        if (!isset($this->types[$name])) {
+        $normalizedName = strtoupper($name);
+
+        if (!isset($this->types[$normalizedName])) {
             throw new ValidationException('Unknown type: ' . $name);
         }
 
-        return $this->types[$name];
+        return $this->types[$normalizedName];
     }
 
     /**
