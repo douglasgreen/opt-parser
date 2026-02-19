@@ -9,6 +9,7 @@ use DouglasGreen\OptParser\Exception\OptParserException;
 use DouglasGreen\OptParser\Exception\UsageException;
 use DouglasGreen\OptParser\Option\Command;
 use DouglasGreen\OptParser\Option\Flag;
+use DouglasGreen\OptParser\Option\OptionInterface;
 use DouglasGreen\OptParser\Option\OptionRegistry;
 use DouglasGreen\OptParser\Option\Param;
 use DouglasGreen\OptParser\Option\Term;
@@ -269,7 +270,17 @@ final readonly class OptParser
      */
     public function addUsage(string $command, array $optionNames): self
     {
-        $this->usageDefinition->addUsage($command, $optionNames);
+        $normalizedNames = [];
+        foreach ($optionNames as $name) {
+            if ($this->optionRegistry->has($name)) {
+                $option = $this->optionRegistry->get($name);
+                $normalizedNames[] = $this->getOfficialName($option);
+            } else {
+                $normalizedNames[] = $name;
+            }
+        }
+
+        $this->usageDefinition->addUsage($command, $normalizedNames);
         return $this;
     }
 
@@ -292,7 +303,7 @@ final readonly class OptParser
         $optionNames = [];
         foreach ($this->optionRegistry->getAll() as $option) {
             if (!$option instanceof Command) {
-                $optionNames[] = $option->getPrimaryName();
+                $optionNames[] = $this->getOfficialName($option);
             }
         }
 
@@ -454,8 +465,20 @@ final readonly class OptParser
             $validatedValues = $this->validateValues($result);
             $command = $result->command;
 
+            // Normalize mappedOptions keys to official names for usage validation
+            $normalizedMappedOptions = [];
+            foreach ($result->mappedOptions as $name => $value) {
+                if ($name === '_') {
+                    $normalizedMappedOptions[$name] = $value;
+                } else {
+                    $option = $this->optionRegistry->get($name);
+                    $officialName = $this->getOfficialName($option);
+                    $normalizedMappedOptions[$officialName] = $value;
+                }
+            }
+
             // Validate ONLY options provided by user against usage rules
-            $this->usageDefinition->validate($command, $result->mappedOptions);
+            $this->usageDefinition->validate($command, $normalizedMappedOptions);
 
             $nonOptions = $result->mappedOptions['_'] ?? [];
 
@@ -495,24 +518,25 @@ final readonly class OptParser
         // 1. Validate provided values
         foreach ($result->rawValues as $name => $value) {
             $option = $this->optionRegistry->get($name);
+            $officialName = $this->getOfficialName($option);
 
             // For multiple flags, use the pre-computed count from mappedOptions
             if ($option->isMultiple() && !$option->acceptsValue()) {
-                $validated[$name] = $result->mappedOptions[$name];
+                $validated[$officialName] = $result->mappedOptions[$name];
             } elseif (is_array($value)) {
                 // Multiple values - validate each one
-                $validated[$name] = [];
+                $validated[$officialName] = [];
                 foreach ($value as $item) {
-                    $validated[$name][] = $option->validateValue($item, $this->typeRegistry);
+                    $validated[$officialName][] = $option->validateValue($item, $this->typeRegistry);
                 }
             } else {
-                $validated[$name] = $option->validateValue($value, $this->typeRegistry);
+                $validated[$officialName] = $option->validateValue($value, $this->typeRegistry);
             }
         }
 
         // 2. Apply defaults and check requirements
         foreach ($this->optionRegistry->getAll() as $option) {
-            $name = $option->getPrimaryName();
+            $name = $this->getOfficialName($option);
 
             if (isset($validated[$name])) {
                 continue;
@@ -685,5 +709,25 @@ final readonly class OptParser
     private function printVersion(string $scriptName): void
     {
         $this->outputHandler->stdout(sprintf('%s %s', $scriptName, $this->version));
+    }
+
+    /**
+     * Determines the official name for an option.
+     *
+     * The official name is the first long name provided (length > 1).
+     * If no long names exist, the first short name is used.
+     *
+     * @param OptionInterface $option The option to inspect
+     * @return string The official name
+     */
+    private function getOfficialName(OptionInterface $option): string
+    {
+        $names = $option->getNames();
+        foreach ($names as $name) {
+            if (strlen($name) > 1) {
+                return $name;
+            }
+        }
+        return $names[0];
     }
 }
