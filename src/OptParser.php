@@ -274,6 +274,33 @@ final readonly class OptParser
     }
 
     /**
+     * Defines a single usage containing all registered options.
+     *
+     * This is for the simple case when you only have one usage (no subcommands).
+     * It adds all registered terms, parameters, and flags to the usage definition
+     * without having to repeat their names.
+     *
+     * @return self Returns $this for method chaining
+     *
+     * @example
+     * ```php
+     * $parser->addUsageAll();
+     * ```
+     */
+    public function addUsageAll(): self
+    {
+        $optionNames = [];
+        foreach ($this->optionRegistry->getAll() as $option) {
+            if (!$option instanceof Command) {
+                $optionNames[] = $option->getPrimaryName();
+            }
+        }
+
+        $this->usageDefinition->addUsage(null, $optionNames);
+        return $this;
+    }
+
+    /**
      * Adds a usage example line to the help output.
      *
      * Examples appear in the 'Examples:' section of the help message,
@@ -427,10 +454,8 @@ final readonly class OptParser
             $validatedValues = $this->validateValues($result);
             $command = $result->command;
 
-            if ($command !== null) {
-                // Validate ONLY options provided by user against usage rules
-                $this->usageDefinition->validate($command, $result->mappedOptions);
-            }
+            // Validate ONLY options provided by user against usage rules
+            $this->usageDefinition->validate($command, $result->mappedOptions);
 
             $nonOptions = $result->mappedOptions['_'] ?? [];
 
@@ -504,6 +529,8 @@ final readonly class OptParser
                     // Global context with subcommands defined: strict requirements disabled
                     // to allow user script to handle "missing command" error.
                     $checkRequired = false;
+                } else {
+                    $checkRequired = $this->usageDefinition->isAllowed(null, $name);
                 }
 
                 if ($checkRequired) {

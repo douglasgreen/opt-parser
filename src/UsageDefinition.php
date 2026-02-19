@@ -54,28 +54,30 @@ final class UsageDefinition
     private array $usages = [];
 
     /**
-     * Registers allowed options for a specific command.
+     * Registers allowed options for a specific command or the main program.
      *
      * Multiple calls for the same command append to the existing allowed
      * options rather than replacing them.
      *
-     * @param string $command The command name to define usage for
+     * @param string|null $command The command name to define usage for, or null for main program
      * @param array<int, string> $optionNames List of option names allowed with this command
      *
      * @example
      * ```php
      * $definition->addUsage('build', ['target', 'verbose', 'output']);
      * $definition->addUsage('build', ['clean']); // Appends 'clean' to existing options
+     * $definition->addUsage(null, ['help', 'version']); // Main program options
      * ```
      */
-    public function addUsage(string $command, array $optionNames): void
+    public function addUsage(?string $command, array $optionNames): void
     {
-        if (!isset($this->usages[$command])) {
-            $this->usages[$command] = [];
+        $commandKey = $command ?? '';
+        if (!isset($this->usages[$commandKey])) {
+            $this->usages[$commandKey] = [];
         }
 
         foreach ($optionNames as $name) {
-            $this->usages[$command][] = $name;
+            $this->usages[$commandKey][] = $name;
         }
     }
 
@@ -86,31 +88,33 @@ final class UsageDefinition
      * The special '_' key (non-option arguments) and the command name itself
      * are always allowed and skipped during validation.
      *
-     * @param string $command The command name to validate against
+     * @param string|null $command The command name to validate against, or null for main program
      * @param array<string, mixed> $providedOptions Options provided by the user
      *
      * @throws UsageException When an option is not allowed with the specified command
      */
-    public function validate(string $command, array $providedOptions): void
+    public function validate(?string $command, array $providedOptions): void
     {
-        if (!isset($this->usages[$command])) {
+        $commandKey = $command ?? '';
+        if (!isset($this->usages[$commandKey])) {
             return; // No usage defined, allow anything
         }
 
-        $allowed = $this->usages[$command];
+        $allowed = $this->usages[$commandKey];
 
         foreach (array_keys($providedOptions) as $name) {
             if ($name === '_') {
                 continue;
             }
 
-            if ($name === $command) {
+            if ($command !== null && $name === $command) {
                 continue;
             }
 
             if (!in_array($name, $allowed, true)) {
+                $commandMsg = $command === null ? 'the main program' : sprintf("command '%s'", $command);
                 throw new UsageException(
-                    sprintf("Option '%s' is not allowed with command '%s'", $name, $command),
+                    sprintf("Option '%s' is not allowed with %s", $name, $commandMsg),
                 );
             }
         }
@@ -123,22 +127,23 @@ final class UsageDefinition
      * or if the option is in the allowed list. The command name itself
      * is always considered allowed.
      *
-     * @param string $command The command name to check against
+     * @param string|null $command The command name to check against, or null for main program
      * @param string $optionName The option name to validate
      *
      * @return bool True if the option is allowed with the command
      */
-    public function isAllowed(string $command, string $optionName): bool
+    public function isAllowed(?string $command, string $optionName): bool
     {
-        if (!isset($this->usages[$command])) {
+        $commandKey = $command ?? '';
+        if (!isset($this->usages[$commandKey])) {
             return true; // No restriction defined
         }
 
         // The command name itself is always allowed
-        if ($optionName === $command) {
+        if ($command !== null && $optionName === $command) {
             return true;
         }
 
-        return in_array($optionName, $this->usages[$command], true);
+        return in_array($optionName, $this->usages[$commandKey], true);
     }
 }
