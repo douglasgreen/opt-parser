@@ -104,17 +104,26 @@ final readonly class OptParser
     private HelpSections $helpSections;
 
     /**
+     * The version string for the application.
+     *
+     * @var string
+     */
+    private string $version;
+
+    /**
      * Constructs a new OptParser with program metadata.
      *
      * @param string $programName The executable name displayed in help output
      * @param string $description A brief description of the program's purpose
-     * @param string $version Semantic version string (default: '1.0.0')
+     * @param string|null $version Semantic version string (default: auto-detected from Git)
      */
     public function __construct(
         private string $programName,
         private string $description,
-        private string $version = '1.0.0',
+        ?string $version = null,
     ) {
+        $this->version = $version ?? $this->detectGitVersion();
+
         $this->optionRegistry = new OptionRegistry();
         $this->typeRegistry = new TypeRegistry();
         $this->tokenizer = new Tokenizer();
@@ -497,6 +506,35 @@ final readonly class OptParser
     public function getVersion(): string
     {
         return $this->version;
+    }
+
+    /**
+     * Detects the version from Git tags or commit date.
+     *
+     * @return string
+     */
+    private function detectGitVersion(): string
+    {
+        // Attempt to get the latest tag
+        $tagOutput = [];
+        $tagReturn = 0;
+        exec('git describe --tags --abbrev=0 2>&1', $tagOutput, $tagReturn);
+
+        if ($tagReturn === 0 && !empty($tagOutput[0])) {
+            return trim($tagOutput[0]);  // e.g., "v1.2.3"
+        }
+
+        // Fallback: Get the date of the last commit
+        $dateOutput = [];
+        $dateReturn = 0;
+        exec('git log -1 --format=%cd --date=short 2>&1', $dateOutput, $dateReturn);
+
+        if ($dateReturn === 0 && !empty($dateOutput[0])) {
+            return trim($dateOutput[0]);  // e.g., "2023-10-15"
+        }
+
+        // If both fail (e.g., not a Git repo or Git not installed)
+        return 'Unknown version';
     }
 
     /**
