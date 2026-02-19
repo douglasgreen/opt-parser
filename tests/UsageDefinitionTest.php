@@ -82,4 +82,29 @@ final class UsageDefinitionTest extends TestCase
         $definition->validate('cmd', ['opt1' => true, 'opt2' => true]);
         $this->assertTrue(true);
     }
+
+    public function test_it_validates_main_program_usage(): void
+    {
+        // Arrange
+        $definition = new UsageDefinition();
+        $definition->addUsage(null, ['verbose', 'output']);
+
+        // Act & Assert (should not throw)
+        $definition->validate(null, ['verbose' => true]);
+        $this->assertTrue(true);
+    }
+
+    public function test_it_throws_on_disallowed_option_for_main_program(): void
+    {
+        // Arrange
+        $definition = new UsageDefinition();
+        $definition->addUsage(null, ['verbose']);
+
+        // Assert
+        $this->expectException(UsageException::class);
+        $this->expectExceptionMessage("Option 'force' is not allowed with the main program");
+
+        // Act
+        $definition->validate(null, ['verbose' => true, 'force' => true]);
+    }
 }

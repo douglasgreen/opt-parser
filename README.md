@@ -171,6 +171,38 @@ switch ($command) {
 }
 ```
 
+### Simple Programs (No Subcommands)
+
+If your program doesn't use subcommands, you can use `addUsageAll()` to automatically allow all registered options for the main program:
+
+```php
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+use DouglasGreen\OptParser\OptParser;
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+$optParser = new OptParser('Simple Tool', 'Does one thing well');
+
+$optParser
+    ->addTerm('input', 'STRING', 'Input file to process')
+    ->addParam(['output', 'o'], 'STRING', 'Output file')
+    ->addFlag(['verbose', 'v'], 'Enable verbose output')
+    ->addUsageAll(); // Automatically registers 'input', 'output', and 'verbose'
+
+try {
+    $input = $optParser->parse();
+} catch (Exception $e) {
+    exit(2);
+}
+
+if ($input->get('verbose')) {
+    echo "Processing " . $input->get('input') . "\n";
+}
+```
+
 ### Option Types
 
 The parser supports four option categories:
