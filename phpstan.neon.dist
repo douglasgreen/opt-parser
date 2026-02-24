@@ -1,10 +1,12 @@
-parameters:
-    level: 8
-    tmpDir: ./var/cache/phpstan
-    phpVersion: 80300
-    treatPhpDocTypesAsCertain: false
+# version: 1.0.1
+# modified: 2026-02-21
 
-    paths:
-        - .php-cs-fixer.php
-        - rector.php
-        - src
+parameters:
+  level: 8
+  paths:
+    - examples
+    - src
+    - tests
+  excludePaths:
+    - var
+    - vendor

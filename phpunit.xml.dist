@@ -1,3 +1,5 @@
+<!-- version: 1.0.0 -->
+<!-- modified: 2026-02-20 -->
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
@@ -12,7 +14,10 @@
 
     <testsuites>
         <testsuite name="Unit">
-            <directory>tests</directory>
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
         </testsuite>
     </testsuites>
 
@@ -23,4 +28,3 @@
         <ini name="memory_limit" value="512M"/>
     </php>
 </phpunit>
-
