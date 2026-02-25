@@ -40,8 +40,6 @@ final class Tokenizer
      *
      * Once terminated, all subsequent arguments are treated as operands
      * regardless of their format.
-     *
-     * @var bool
      */
     private bool $terminated = false;
 

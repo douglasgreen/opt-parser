@@ -112,9 +112,7 @@ final class ParamTest extends TestCase
     public function test_it_applies_filter_closure(): void
     {
         // Arrange
-        $filter = function (string $value): string {
-            return strtoupper($value);
-        };
+        $filter = (fn(string $value): string => strtoupper($value));
         $param = new Param(['name'], 'Name', 'STRING', false, null, $filter);
         $registry = new TypeRegistry();
 
@@ -132,6 +130,7 @@ final class ParamTest extends TestCase
             if (strlen($value) < 5) {
                 throw new Exception('Too short');
             }
+
             return $value;
         };
         $param = new Param(['name'], 'Name', 'STRING', false, null, $filter);

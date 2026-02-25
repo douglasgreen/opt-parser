@@ -60,29 +60,21 @@ final readonly class OptParser
 {
     /**
      * Registry containing all defined options, commands, and flags.
-     *
-     * @var OptionRegistry
      */
     private OptionRegistry $optionRegistry;
 
     /**
      * Registry for type validators used during value validation.
-     *
-     * @var TypeRegistry
      */
     private TypeRegistry $typeRegistry;
 
     /**
      * Tokenizer for converting raw argv into parseable tokens.
-     *
-     * @var Tokenizer
      */
     private Tokenizer $tokenizer;
 
     /**
      * Definition of per-command usage constraints.
-     *
-     * @var UsageDefinition
      */
     private UsageDefinition $usageDefinition;
 
@@ -91,22 +83,16 @@ final readonly class OptParser
 
     /**
      * Handler for formatted stdout/stderr output.
-     *
-     * @var OutputHandler
      */
     private OutputHandler $outputHandler;
 
     /**
      * Container for optional help sections (examples, exit codes, etc.).
-     *
-     * @var HelpSections
      */
     private HelpSections $helpSections;
 
     /**
      * The version string for the application.
-     *
-     * @var string
      */
     private string $version;
 
@@ -510,8 +496,6 @@ final readonly class OptParser
 
     /**
      * Detects the version from Git tags or commit date.
-     *
-     * @return string
      */
     private function detectGitVersion(): string
     {
@@ -643,8 +627,6 @@ final readonly class OptParser
      * additional sections (examples, exit codes, environment, documentation).
      *
      * @param string $scriptName The script name for usage line display
-     *
-     * @return void
      */
     private function printHelp(string $scriptName): void
     {
@@ -700,8 +682,6 @@ final readonly class OptParser
      *
      * @param string $title Section title (will have ':' appended)
      * @param array<int, string> $lines Lines to display under the title
-     *
-     * @return void
      */
     private function printArraySection(string $title, array $lines): void
     {
@@ -721,8 +701,6 @@ final readonly class OptParser
      *
      * @param string $title Section title (will have ':' appended)
      * @param array<string, string> $items Key-value pairs to display
-     *
-     * @return void
      */
     private function printMapSection(string $title, array $items): void
     {
@@ -741,8 +719,6 @@ final readonly class OptParser
      * Outputs the version string to stdout.
      *
      * @param string $scriptName The script name to display
-     *
-     * @return void
      */
     private function printVersion(string $scriptName): void
     {

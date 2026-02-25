@@ -17,8 +17,8 @@ $optParser
 
 try {
     $input = $optParser->parse();
-} catch (Exception $e) {
-    fwrite(STDERR, 'Error: ' . $e->getMessage() . "\n");
+} catch (Exception $exception) {
+    fwrite(STDERR, 'Error: ' . $exception->getMessage() . "\n");
     exit(2);
 }
 
@@ -28,14 +28,14 @@ $outputFile = $input->get('output');
 
 if ($verbose) {
     echo "Verbose mode enabled\n";
-    echo "Input file: $inputFile\n";
+    echo sprintf('Input file: %s%s', $inputFile, PHP_EOL);
     if ($outputFile) {
-        echo "Output file: $outputFile\n";
+        echo sprintf('Output file: %s%s', $outputFile, PHP_EOL);
     }
 }
 
-echo "Processing $inputFile...\n";
+echo "Processing {$inputFile}...\n";
 if ($outputFile) {
-    echo "Saving to $outputFile...\n";
+    echo "Saving to {$outputFile}...\n";
 }
 echo "Done!\n";

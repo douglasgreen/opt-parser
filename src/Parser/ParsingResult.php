@@ -20,8 +20,6 @@ final class ParsingResult
 
     /**
      * The resolved command name if a command was matched.
-     *
-     * @var string|null
      */
     public ?string $command = null;
 

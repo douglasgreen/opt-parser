@@ -144,9 +144,7 @@ final readonly class Param extends AbstractOption
             try {
                 $typedValue = ($this->filter)($typedValue);
             } catch (Exception $e) {
-                throw new ValidationException(
-                    sprintf("Filter rejected value for '%s': %s", $this->getPrimaryName(), $e->getMessage()),
-                );
+                throw new ValidationException(sprintf("Filter rejected value for '%s': %s", $this->getPrimaryName(), $e->getMessage()), $e->getCode(), $e);
             }
         }
 

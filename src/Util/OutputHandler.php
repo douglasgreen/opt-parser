@@ -44,15 +44,11 @@ final class OutputHandler
      * Cached TTY detection result for stdout.
      *
      * Lazily initialized on first call to isTty().
-     *
-     * @var bool
      */
     private bool $isTty;
 
     /**
      * Whether color output should be disabled per NO_COLOR convention.
-     *
-     * @var bool
      */
     private readonly bool $noColor;
 

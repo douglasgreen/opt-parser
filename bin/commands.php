@@ -48,9 +48,9 @@ $optParser
 // Parse arguments
 try {
     $input = $optParser->parse();
-} catch (Exception $e) {
-    fwrite(STDERR, 'Error: ' . $e->getMessage() . "\n");
-    exit($e->getCode() ?: 2);
+} catch (Exception $exception) {
+    fwrite(STDERR, 'Error: ' . $exception->getMessage() . "\n");
+    exit($exception->getCode() ?: 2);
 }
 
 // Execute based on matched command
@@ -108,12 +108,12 @@ switch ($command) {
 
         if ($verbose) {
             $output('Operation: ADD');
-            $output("  Username: $username");
+            $output('  Username: ' . $username);
             $output('  Email: ' . ($email ?? 'N/A'));
-            $output("  Role: $role");
-            $output('  Password: ' . ($password ? str_repeat('*', strlen($password)) : 'N/A'));
+            $output('  Role: ' . $role);
+            $output('  Password: ' . ($password ? str_repeat('*', strlen((string) $password)) : 'N/A'));
             $output('  Tags: ' . ($tags ? implode(', ', $tags) : 'N/A'));
-            $output("  Verbosity level: $verbosity");
+            $output('  Verbosity level: ' . $verbosity);
         }
 
         if (!$password) {
@@ -122,14 +122,14 @@ switch ($command) {
         }
 
         // Validate password length
-        if (strlen($password) < 6) {
+        if (strlen((string) $password) < 6) {
             $output('Error: Password must be at least 6 characters', true);
             exit(1);
         }
 
         // Build success message with tags if provided
         $tagMsg = $tags ? ' with tags: ' . implode(', ', $tags) : '';
-        echo "SUCCESS: Added user '$username' with role '$role'$tagMsg" . PHP_EOL;
+        echo sprintf("SUCCESS: Added user '%s' with role '%s'%s", $username, $role, $tagMsg) . PHP_EOL;
         exit(0);
 
     case 'delete':
@@ -144,17 +144,17 @@ switch ($command) {
 
         if ($verbose) {
             $output('Operation: DELETE');
-            $output("  Username: $username");
+            $output('  Username: ' . $username);
             $output('  Force: ' . ($force ? 'yes' : 'no'));
         }
 
         if (!$force) {
             $output('WARNING: Deletion requires --force flag for safety');
-            $output("To delete '$username', run: delete $username --force");
+            $output(sprintf("To delete '%s', run: delete %s --force", $username, $username));
             exit(1);
         }
 
-        echo "SUCCESS: Deleted user '$username'" . PHP_EOL;
+        echo sprintf("SUCCESS: Deleted user '%s'", $username) . PHP_EOL;
         exit(0);
 
     case 'list':
@@ -173,18 +173,14 @@ switch ($command) {
 
         $lines = [];
         foreach ($users as $user) {
-            if ($verbose) {
-                $lines[] = sprintf('%-15s %-10s %s', $user['username'], $user['role'], $user['email']);
-            } else {
-                $lines[] = $user['username'];
-            }
+            $lines[] = $verbose ? sprintf('%-15s %-10s %s', $user['username'], $user['role'], $user['email']) : $user['username'];
         }
 
         $content = implode("\n", $lines) . "\n";
 
         if ($outputFile) {
             file_put_contents($outputFile, $content);
-            $output('SUCCESS: Listed ' . count($users) . " users to '$outputFile'");
+            $output('SUCCESS: Listed ' . count($users) . sprintf(" users to '%s'", $outputFile));
         } else {
             echo $content;
             $output('SUCCESS: Listed ' . count($users) . ' users');
@@ -199,7 +195,7 @@ switch ($command) {
             $output('Operation: SEARCH');
             $output('  Usernames: ' . implode(', ', $usernames));
             $output('  Tags: ' . ($tags ? implode(', ', $tags) : 'N/A'));
-            $output("  Verbosity level: $verbosity");
+            $output('  Verbosity level: ' . $verbosity);
         }
 
         // Simulated user database
@@ -258,13 +254,13 @@ switch ($command) {
                 'json' => $json,
             ]) . PHP_EOL;
         } else {
-            echo "Command: $command" . PHP_EOL;
+            echo 'Command: ' . $command . PHP_EOL;
             echo 'Config: ' . ($config ?? 'N/A') . PHP_EOL;
             echo 'JSON: ' . ($json ? 'yes' : 'no') . PHP_EOL;
         }
         exit(0);
 
     default:
-        $output("Error: Unknown command '$command'", true);
+        $output(sprintf("Error: Unknown command '%s'", $command), true);
         exit(2);
 }
