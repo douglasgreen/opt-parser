@@ -4,15 +4,19 @@ A POSIX.1-2017 compliant command-line option parser for PHP with GNU extensions.
 
 ## Overview
 
-OptParser implements the [IEEE Std 1003.1-2017 (POSIX.1-2017)](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html) utility conventions, supporting:
+OptParser implements the
+[IEEE Std 1003.1-2017 (POSIX.1-2017)](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html)
+utility conventions, supporting:
 
-- **Standard option syntax**: Short options (`-a`), clustering (`-abc`), and arguments (`-a value` or `-a=value`)
+- **Standard option syntax**: Short options (`-a`), clustering (`-abc`), and arguments (`-a value`
+  or `-a=value`)
 - **GNU extensions**: Long options (`--option`, `--option=value`) for enhanced readability
 - **Strict separation**: stdout for data, stderr for diagnostics
 - **Standard exit codes**: `0` (success), `2` (usage error), `130` (SIGINT), etc.
 - **Type safety**: Built-in validation for 20+ data types (paths, dates, networks, etc.)
 
-Unlike PHP's built-in `getopt()`, OptParser supports positional arguments (terms), subcommands, automatic help generation, and strict validation with descriptive error messages.
+Unlike PHP's built-in `getopt()`, OptParser supports positional arguments (terms), subcommands,
+automatic help generation, and strict validation with descriptive error messages.
 
 ## Installation
 
@@ -22,7 +26,8 @@ composer require douglasgreen/opt-parser
 
 ## POSIX Compliance
 
-This library adheres to POSIX.1-2017 Section 12.2 (Utility Syntax Guidelines) and XCU Section 12.2 (Utility Conventions):
+This library adheres to POSIX.1-2017 Section 12.2 (Utility Syntax Guidelines) and XCU Section 12.2
+(Utility Conventions):
 
 ### Option Syntax
 
@@ -36,7 +41,9 @@ This library adheres to POSIX.1-2017 Section 12.2 (Utility Syntax Guidelines) an
 | `--long=value` | Long option with argument                       | `--output=file.txt`                |
 | `--`           | Option terminator (remaining args are operands) | `-- -filename-starting-with-dash`  |
 
-**Important**: When using clustered options, if the last option in a cluster requires an argument, the remaining characters are interpreted as the argument. For example, if `-o` requires an argument, `-abcovalue` is equivalent to `-a -b -c -o value`.
+**Important**: When using clustered options, if the last option in a cluster requires an argument,
+the remaining characters are interpreted as the argument. For example, if `-o` requires an argument,
+`-abcovalue` is equivalent to `-a -b -c -o value`.
 
 ### Exit Codes
 
@@ -54,11 +61,13 @@ OptParser uses standard exit codes per `sysexits.h` and POSIX conventions:
 ### Stream Handling
 
 - **stdout**: Primary data output (results, matched options, machine-readable formats)
-- **stderr**: Diagnostic messages (errors, warnings, progress, help text when explicitly requested via error)
+- **stderr**: Diagnostic messages (errors, warnings, progress, help text when explicitly requested
+  via error)
 
 ### Signal Handling
 
-Long-running operations should handle `SIGINT` (Ctrl+C) gracefully, performing cleanup and exiting with status `130`.
+Long-running operations should handle `SIGINT` (Ctrl+C) gracefully, performing cleanup and exiting
+with status `130`.
 
 ## Usage Guide
 
@@ -173,7 +182,8 @@ switch ($command) {
 
 ### Simple Programs (No Subcommands)
 
-If your program doesn't use subcommands, you can use `addUsageAll()` to automatically allow all registered options for the main program:
+If your program doesn't use subcommands, you can use `addUsageAll()` to automatically allow all
+registered options for the main program:
 
 ```php
 #!/usr/bin/env php
@@ -217,11 +227,14 @@ The parser supports four option categories:
 
 ### Option Name Resolution
 
-When defining options with multiple names (aliases), the parser designates an **official name** used for storing and retrieving values. This ensures consistent access regardless of which alias was used on the command line.
+When defining options with multiple names (aliases), the parser designates an **official name** used
+for storing and retrieving values. This ensures consistent access regardless of which alias was used
+on the command line.
 
 **Resolution Rules:**
 
-1. **First Long Name**: If one or more long names (length > 1) are provided, the first long name is used.
+1. **First Long Name**: If one or more long names (length > 1) are provided, the first long name is
+   used.
 2. **First Short Name**: If only short names are provided, the first short name is used.
 
 **Example:**
@@ -241,7 +254,8 @@ This behavior applies to Commands, Parameters, and Flags.
 
 ### Multiple-Value Terms
 
-Terms can accept one or more values by setting the `multiple` parameter to `true`. When enabled, the term collects all remaining positional arguments into an array:
+Terms can accept one or more values by setting the `multiple` parameter to `true`. When enabled, the
+term collects all remaining positional arguments into an array:
 
 ```php
 // Single-value term (default)
@@ -346,7 +360,7 @@ Errors are written to **stderr** with descriptive messages. The parser distingui
 
 Example error output:
 
-```
+```text
 error: Unknown option '--verbos'
 error: option '--output' requires an argument
 error: term 'username' has invalid argument '123': Not a valid string
@@ -356,7 +370,8 @@ error: term 'username' has invalid argument '123': Not a valid string
 
 #### Multiple-Value Parameters
 
-Parameters can accept multiple values by setting the `multiple` parameter to `true`. Each occurrence of the option adds a value to an array:
+Parameters can accept multiple values by setting the `multiple` parameter to `true`. Each occurrence
+of the option adds a value to an array:
 
 ```php
 // Multiple-value parameter - collect multiple ignore paths
@@ -382,7 +397,8 @@ foreach ($ignorePaths as $path) {
 
 #### Multiple-Occurrence Flags
 
-Flags can be specified multiple times to increment a counter by setting the `multiple` parameter to `true`:
+Flags can be specified multiple times to increment a counter by setting the `multiple` parameter to
+`true`:
 
 ```php
 // Multiple-occurrence flag - increase verbosity level
@@ -435,7 +451,9 @@ $optParser->addParam(
 
 #### Help Sections
 
-You can add additional sections to the automatically generated help output to provide examples, document exit codes, environment variables, and links to documentation. The help output automatically uses the script filename in the usage line (e.g., `Usage: script.php [options]`).
+You can add additional sections to the automatically generated help output to provide examples,
+document exit codes, environment variables, and links to documentation. The help output
+automatically uses the script filename in the usage line (e.g., `Usage: script.php [options]`).
 
 Each method adds one item to the respective section:
 
@@ -452,7 +470,7 @@ $optParser
 
 Resulting `--help` output:
 
-```
+```text
 Usage: example.php [options] [command] [args]
 
 Manage system user accounts
@@ -525,7 +543,8 @@ $nonOptions = $input->getNonoptions(); // ['--force']
 
 ### Best Practices
 
-1. **Options before operands**: While POSIX allows intermixing, place all options before positional arguments for clarity
+1. **Options before operands**: While POSIX allows intermixing, place all options before positional
+   arguments for clarity
 2. **Use long options in scripts**: `--verbose` is more readable than `-v` in automation
 3. **Check exit codes**: Always check `$?` in shell scripts; don't assume success
 4. **Quote operands**: Always quote variables that might contain spaces or special characters

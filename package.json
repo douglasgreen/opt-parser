@@ -9,7 +9,7 @@
     "lint": "npm run lint:md && npm run lint:sh",
     "lint:md": "markdownlint '**/*.md'",
     "lint:sh": "shellcheck **/*.sh",
-    "format": "prettier --write ."
+    "format": "prettier --write . && markdownlint '**/*.md' --fix"
   },
   "devDependencies": {
     "markdownlint-cli": "^0.47.0",
