@@ -1,7 +1,6 @@
 <?php
 
-// version: 1.1.0
-// modified: 2026-02-24
+// modified: 2026-02-26
 
 use Rector\Config\RectorConfig;
 use Rector\Php81\Rector\ClassMethod\NewInInitializerRector;
@@ -12,6 +11,7 @@ use Rector\ValueObject\PhpVersion;
 return RectorConfig::configure()
     ->withPaths([
         __DIR__ . '/bin',
+        __DIR__ . '/public',
         __DIR__ . '/src',
         __DIR__ . '/tests',
     ])

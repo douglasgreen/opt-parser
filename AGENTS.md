@@ -1,8 +1,5 @@
 ---
-name: AGENTS.md
-description: Guidelines for AI coding assistants.
-version: 1.0.0
-modified: 2026-02-22
+modified: 2026-02-26
 ---
 
 # AGENTS.md
@@ -66,7 +63,7 @@ composer qa
 
 **Verification Checklist:**
 
-1. **PHPStan:** Must pass at Level 9 without ignored errors.
+1. **PHPStan:** Must pass at Level 8 without ignored errors.
 2. **PHP CS Fixer:** Must adhere to the rules in `.php-cs-fixer.dist.php`.
 3. **PHPUnit:** New features must include tests using PHPUnit 10 Attributes (e.g., `#[CoversClass]`,
    `#[Test]`).

@@ -1,6 +1,5 @@
 <?php
-// version: 1.0.2
-// modified: 2026-02-25
+// modified: 2026-02-26
 
 use PhpCsFixer\Runner\Parallel\ParallelConfigFactory;
 use PhpCsFixer\Config;
