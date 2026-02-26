@@ -69,7 +69,7 @@ composer qa
 
 ### 5. Standard Implementation Examples
 
-#### When creating a Class:
+#### When creating a Class
 
 ```php
 final readonly class MyService
@@ -85,7 +85,7 @@ final readonly class MyService
 }
 ```
 
-#### When creating a Test:
+#### When creating a Test
 
 ```php
 #[CoversClass(MyService::class)]

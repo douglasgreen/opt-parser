@@ -26,15 +26,15 @@ This library adheres to POSIX.1-2017 Section 12.2 (Utility Syntax Guidelines) an
 
 ### Option Syntax
 
-| Syntax | Description | Example |
-|--------|-------------|---------|
-| `-a` | Short option | `-v` (verbose) |
-| `-abc` | Clustered options (equivalent to `-a -b -c`) | `-vrf` (verbose, recursive, force) |
-| `-a value` | Option with argument (space-separated) | `-o output.txt` |
-| `-a=value` | Option with argument (equals-separated) | `-o=output.txt` |
-| `--long` | Long option (GNU extension) | `--verbose` |
-| `--long=value` | Long option with argument | `--output=file.txt` |
-| `--` | Option terminator (remaining args are operands) | `-- -filename-starting-with-dash` |
+| Syntax         | Description                                     | Example                            |
+| -------------- | ----------------------------------------------- | ---------------------------------- |
+| `-a`           | Short option                                    | `-v` (verbose)                     |
+| `-abc`         | Clustered options (equivalent to `-a -b -c`)    | `-vrf` (verbose, recursive, force) |
+| `-a value`     | Option with argument (space-separated)          | `-o output.txt`                    |
+| `-a=value`     | Option with argument (equals-separated)         | `-o=output.txt`                    |
+| `--long`       | Long option (GNU extension)                     | `--verbose`                        |
+| `--long=value` | Long option with argument                       | `--output=file.txt`                |
+| `--`           | Option terminator (remaining args are operands) | `-- -filename-starting-with-dash`  |
 
 **Important**: When using clustered options, if the last option in a cluster requires an argument, the remaining characters are interpreted as the argument. For example, if `-o` requires an argument, `-abcovalue` is equivalent to `-a -b -c -o value`.
 
@@ -42,14 +42,14 @@ This library adheres to POSIX.1-2017 Section 12.2 (Utility Syntax Guidelines) an
 
 OptParser uses standard exit codes per `sysexits.h` and POSIX conventions:
 
-| Code | Meaning | Usage |
-|------|---------|-------|
-| `0` | `EXIT_SUCCESS` | Successful execution |
-| `1` | `EXIT_FAILURE` | General error (catchall) |
-| `2` | `EX_USAGE` | CLI usage error (invalid arguments, unknown options) |
-| `126` | - | Command invoked cannot execute (permission denied) |
-| `127` | - | Command not found |
-| `130` | - | Fatal error signal (`128 + SIGINT(2)`) |
+| Code  | Meaning        | Usage                                                |
+| ----- | -------------- | ---------------------------------------------------- |
+| `0`   | `EXIT_SUCCESS` | Successful execution                                 |
+| `1`   | `EXIT_FAILURE` | General error (catchall)                             |
+| `2`   | `EX_USAGE`     | CLI usage error (invalid arguments, unknown options) |
+| `126` | -              | Command invoked cannot execute (permission denied)   |
+| `127` | -              | Command not found                                    |
+| `130` | -              | Fatal error signal (`128 + SIGINT(2)`)               |
 
 ### Stream Handling
 
@@ -207,23 +207,25 @@ if ($input->get('verbose')) {
 
 The parser supports four option categories:
 
-| Type | Description | POSIX Equivalent | Example |
-|------|-------------|------------------|---------|
-| **Command** | Subcommand selector (first positional) | Utility operand | `git clone` |
-| **Term** | Positional argument with validation | Utility operand | `file.txt` |
-| **Term (multiple)** | Positional argument accepting one or more values | Utility operand(s) | `file1.txt file2.txt file3.txt` |
-| **Param** | Option requiring an argument | Option with operand | `-o file` or `--output=file` |
-| **Flag** | Boolean option without argument | Option without operand | `-v` or `--verbose` |
+| Type                | Description                                      | POSIX Equivalent       | Example                         |
+| ------------------- | ------------------------------------------------ | ---------------------- | ------------------------------- |
+| **Command**         | Subcommand selector (first positional)           | Utility operand        | `git clone`                     |
+| **Term**            | Positional argument with validation              | Utility operand        | `file.txt`                      |
+| **Term (multiple)** | Positional argument accepting one or more values | Utility operand(s)     | `file1.txt file2.txt file3.txt` |
+| **Param**           | Option requiring an argument                     | Option with operand    | `-o file` or `--output=file`    |
+| **Flag**            | Boolean option without argument                  | Option without operand | `-v` or `--verbose`             |
 
 ### Option Name Resolution
 
 When defining options with multiple names (aliases), the parser designates an **official name** used for storing and retrieving values. This ensures consistent access regardless of which alias was used on the command line.
 
 **Resolution Rules:**
+
 1. **First Long Name**: If one or more long names (length > 1) are provided, the first long name is used.
 2. **First Short Name**: If only short names are provided, the first short name is used.
 
 **Example:**
+
 ```php
 // Names: short 'p', long 'pass', long 'password'
 $optParser->addParam(['p', 'pass', 'password'], 'STRING', 'Password');
@@ -250,6 +252,7 @@ $optParser->addTerm('usernames', 'STRING', 'One or more usernames', true, null, 
 ```
 
 **Usage example:**
+
 ```bash
 # Search for multiple users
 php user-manager.php search alice bob charlie
@@ -259,6 +262,7 @@ php cleanup.php file1.txt file2.txt file3.txt
 ```
 
 **Accessing values:**
+
 ```php
 $usernames = $input->get('usernames'); // Returns array: ['alice', 'bob', 'charlie']
 
@@ -268,6 +272,7 @@ foreach ($usernames as $username) {
 ```
 
 **Important notes:**
+
 - A multiple-value term consumes all remaining positional arguments
 - If multiple terms are defined, only the last one should have `multiple: true`
 - The value is always returned as an array (empty array if no values provided)
@@ -275,17 +280,20 @@ foreach ($usernames as $username) {
 ### POSIX Option Syntax Details
 
 **Short Options:**
+
 - Single hyphen followed by single character: `-a`
 - May be clustered: `-abc` equivalent to `-a -b -c`
 - Argument may follow immediately or be separated by space: `-ovalue` or `-o value`
 - If clustering options where the last takes an argument: `-abco value` or `-abcovalue`
 
 **Long Options:**
+
 - Double hyphen followed by name: `--verbose`
 - Arguments may be separated by space or equals: `--output file` or `--output=file`
 - Names use kebab-case (lowercase with hyphens)
 
 **Option Terminator:**
+
 - Double hyphen `--` indicates end of options
 - All subsequent arguments are treated as operands (terms), even if they start with `-`
 
@@ -293,40 +301,40 @@ foreach ($usernames as $username) {
 
 Built-in validation types (extending POSIX with type safety):
 
-| Type | Validation | Example |
-|------|------------|---------|
-| `STRING` | Any string | `"hello"` |
-| `INT` | Integer (octal/hex supported) | `42`, `0x2A` |
-| `FLOAT` | Floating point | `3.14`, `1e10` |
-| `BOOL` | Boolean | `true`, `1`, `yes` |
-| `DATE` | ISO 8601 date | `2024-01-15` |
-| `DATETIME` | ISO 8601 datetime | `2024-01-15 14:30:00` |
-| `TIME` | Time string | `14:30:00` |
-| `INTERVAL` | Date interval | `1 day 2 hours` |
-| `EMAIL` | Email address | `user@example.com` |
-| `URL` | URL | `https://example.com` |
-| `DOMAIN` | Domain name | `example.com` |
-| `IP_ADDR` | IP address | `192.168.1.1` |
-| `MAC_ADDR` | MAC address | `00:1B:44:11:3A:B7` |
-| `UUID` | UUID | `550e8400-e29b-41d4-a716-446655440000` |
-| `INFILE` | Readable file path | `/path/to/input` |
-| `OUTFILE` | Writable file path | `/path/to/output` |
-| `DIR` | Readable directory | `/path/to/dir` |
-| `FIXED` | Fixed-point number | `1,234.56` |
+| Type       | Validation                    | Example                                |
+| ---------- | ----------------------------- | -------------------------------------- |
+| `STRING`   | Any string                    | `"hello"`                              |
+| `INT`      | Integer (octal/hex supported) | `42`, `0x2A`                           |
+| `FLOAT`    | Floating point                | `3.14`, `1e10`                         |
+| `BOOL`     | Boolean                       | `true`, `1`, `yes`                     |
+| `DATE`     | ISO 8601 date                 | `2024-01-15`                           |
+| `DATETIME` | ISO 8601 datetime             | `2024-01-15 14:30:00`                  |
+| `TIME`     | Time string                   | `14:30:00`                             |
+| `INTERVAL` | Date interval                 | `1 day 2 hours`                        |
+| `EMAIL`    | Email address                 | `user@example.com`                     |
+| `URL`      | URL                           | `https://example.com`                  |
+| `DOMAIN`   | Domain name                   | `example.com`                          |
+| `IP_ADDR`  | IP address                    | `192.168.1.1`                          |
+| `MAC_ADDR` | MAC address                   | `00:1B:44:11:3A:B7`                    |
+| `UUID`     | UUID                          | `550e8400-e29b-41d4-a716-446655440000` |
+| `INFILE`   | Readable file path            | `/path/to/input`                       |
+| `OUTFILE`  | Writable file path            | `/path/to/output`                      |
+| `DIR`      | Readable directory            | `/path/to/dir`                         |
+| `FIXED`    | Fixed-point number            | `1,234.56`                             |
 
 ### Exit Codes
 
 The library uses standard exit codes per `sysexits.h` and POSIX conventions:
 
-| Code | Constant | Meaning |
-|------|----------|---------|
-| `0` | `EXIT_SUCCESS` | Successful execution |
-| `1` | `EXIT_FAILURE` | General error during execution |
-| `2` | `EX_USAGE` | Command line usage error (invalid arguments, unknown options, missing required options) |
-| `126` | - | Command invoked cannot execute (permission denied) |
-| `127` | - | Command not found |
-| `128` | - | Invalid exit argument |
-| `130` | - | Script terminated by Ctrl+C (SIGINT) |
+| Code  | Constant       | Meaning                                                                                 |
+| ----- | -------------- | --------------------------------------------------------------------------------------- |
+| `0`   | `EXIT_SUCCESS` | Successful execution                                                                    |
+| `1`   | `EXIT_FAILURE` | General error during execution                                                          |
+| `2`   | `EX_USAGE`     | Command line usage error (invalid arguments, unknown options, missing required options) |
+| `126` | -              | Command invoked cannot execute (permission denied)                                      |
+| `127` | -              | Command not found                                                                       |
+| `128` | -              | Invalid exit argument                                                                   |
+| `130` | -              | Script terminated by Ctrl+C (SIGINT)                                                    |
 
 ### Error Handling
 
@@ -337,6 +345,7 @@ Errors are written to **stderr** with descriptive messages. The parser distingui
 - **Logic errors**: Exceptions thrown during callback execution
 
 Example error output:
+
 ```
 error: Unknown option '--verbos'
 error: option '--output' requires an argument
@@ -355,12 +364,14 @@ $optParser->addParam(['ignore', 'i'], 'STRING', 'Paths to ignore', null, false, 
 ```
 
 **Usage example:**
+
 ```bash
 # Ignore multiple paths
 php cleanup.php --ignore path1 --ignore path2 --ignore path3
 ```
 
 **Accessing values:**
+
 ```php
 $ignorePaths = $input->get('ignore'); // Returns array: ['path1', 'path2', 'path3']
 
@@ -379,6 +390,7 @@ $optParser->addFlag(['verbose', 'v'], 'Increase verbosity (can be repeated)', tr
 ```
 
 **Usage example:**
+
 ```bash
 # Increase verbosity level
 php app.php -v -v -v
@@ -387,6 +399,7 @@ php app.php --verbose --verbose --verbose
 ```
 
 **Accessing values:**
+
 ```php
 $verbosity = $input->get('verbose'); // Returns int: 3
 
@@ -505,6 +518,7 @@ php delete.php -- --force
 ```
 
 Access via:
+
 ```php
 $nonOptions = $input->getNonoptions(); // ['--force']
 ```
@@ -519,17 +533,17 @@ $nonOptions = $input->getNonoptions(); // ['--force']
 
 ### Comparison with getopt()
 
-| Feature | PHP getopt() | OptParser |
-|---------|--------------|-------------|
-| Short options | Yes | Yes |
-| Long options | Limited | Yes (GNU style) |
-| Option clustering | No | Yes (`-abc`) |
-| Positional arguments | No | Yes (Terms) |
-| Subcommands | No | Yes (Commands) |
-| Type validation | No | Yes (20+ types) |
-| Automatic help | No | Yes |
-| Standard exit codes | No | Yes |
-| `--` terminator | Partial | Full |
+| Feature              | PHP getopt() | OptParser       |
+| -------------------- | ------------ | --------------- |
+| Short options        | Yes          | Yes             |
+| Long options         | Limited      | Yes (GNU style) |
+| Option clustering    | No           | Yes (`-abc`)    |
+| Positional arguments | No           | Yes (Terms)     |
+| Subcommands          | No           | Yes (Commands)  |
+| Type validation      | No           | Yes (20+ types) |
+| Automatic help       | No           | Yes             |
+| Standard exit codes  | No           | Yes             |
+| `--` terminator      | Partial      | Full            |
 
 ### License
 
