@@ -2,7 +2,6 @@
 <!-- modified: 2026-02-26 -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
-         bootstrap="tests/bootstrap.php"
          colors="true"
          cacheDirectory="var/cache/.phpunit.cache"
          executionOrder="depends,defects"

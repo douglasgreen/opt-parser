@@ -1,7 +1,7 @@
 {
   "modified": "2026-02-26",
-  "name": "owner/project",
-  "description": "***",
+  "name": "douglasgreen/opt-parser",
+  "description": "Command-line option parser for PHP",
   "type": "project",
   "license": "MIT",
   "require": {
@@ -16,7 +16,8 @@
   },
   "autoload": {
     "psr-4": {
-      "App\\": "src/"
+      "DouglasGreen\\OptParser\\": "src/",
+      "Tests\\Unit\\": "tests/"
     }
   },
   "config": {
