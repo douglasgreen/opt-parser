@@ -1,5 +1,5 @@
 {
-  "modified": "2026-02-26",
+  "modified": "2026-02-27",
   "name": "douglasgreen/opt-parser",
   "version": "1.0.0",
   "description": "Command-line option parser for PHP",
@@ -7,7 +7,7 @@
   "scripts": {
     "lint": "npm run lint:md && npm run lint:sh",
     "lint:md": "markdownlint '**/*.md'",
-    "lint:sh": "shellcheck '**/*.sh'",
+    "lint:sh": "shellcheck **/*.sh",
     "format": "prettier --write . && markdownlint '**/*.md' --fix"
   },
   "devDependencies": {
